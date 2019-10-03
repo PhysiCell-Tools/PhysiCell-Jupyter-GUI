@@ -1,5 +1,5 @@
 # 
-# setup_new_proj.py - create a new PhysiCell Jupyter notebook project [for nanoHUB] by copying the contents of this 
+# pc2gui.py - create a new PhysiCell Jupyter notebook project [for nanoHUB] by copying the contents of this 
 #                     project and an existing PhysiCell project into the new project.
 #
 # Assumptions:
@@ -49,7 +49,7 @@ if (num_args > 4):
     make_file = sys.argv[4]
     main_cpp_file = sys.argv[5]
 
-print("\n STEP 1: copy tool4nanobio to new project:\n")
+print("\n STEP 1: copy pc2gui to new project:\n")
 to_file = os.path.join(proj_fullpath, ".travis.yml")        # (from_file, to_file)
 shutil.copy(".travis.yml", to_file)
 
@@ -165,14 +165,14 @@ print('gui_name=',gui_name)
 # NOTE: let's not do this now; rather edit the invoke script *on* github to avoid 
 #        the (Windows) problem of making it a non-executable file
 with open('middleware/invoke', 'r') as myfile:
-#   new_text = myfile.read().replace('tool4nanobio', gui_name)
-   new_text = myfile.read().replace("-t tool4nanobio", "-t " + tool_name)
-   new_text = new_text.replace("tool4nanobio", gui_name)
+#   new_text = myfile.read().replace('pc2gui', gui_name)
+   new_text = myfile.read().replace("-t mygui", "-t " + tool_name)
+   new_text = new_text.replace("mygui", gui_name)
 with open('middleware/invoke', 'w') as myfile:
    myfile.write(new_text)
 
 #--------------
-old_file = os.path.join("bin", 'tool4nanobio.py')
+old_file = os.path.join("bin", 'pc2gui.py')
 new_file = os.path.join("bin", gui_name + '.py')
 try:
     shutil.move(old_file, new_file)
@@ -182,12 +182,12 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('tool4nanobio', gui_name)
+    new_text = myfile.read().replace('pc2gui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
 #--------------
-old_file = 'tool4nanobio.ipynb'
+old_file = 'pc2gui.ipynb'
 new_file = gui_name + '.ipynb'
 try:
     shutil.move(old_file, new_file)
@@ -197,7 +197,7 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('tool4nanobio', gui_name)
+    new_text = myfile.read().replace('pc2gui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
@@ -242,12 +242,12 @@ sys.exit(1)
 # NOTE: let's not do this now; rather edit the invoke script *on* github to avoid 
 #       the (Windows) problem of making it a non-executable file
 #with open('middleware/invoke', 'r') as myfile:
-#    new_text = myfile.read().replace('tool4nanobio', gui_name)
+#    new_text = myfile.read().replace('pc2gui', gui_name)
 #with open('middleware/invoke', 'w') as myfile:
 #    myfile.write(new_text)
 
 #--------------
-old_file = os.path.join("bin", 'tool4nanobio.py')
+old_file = os.path.join("bin", 'pc2gui.py')
 new_file = os.path.join("bin", gui_name + '.py')
 try:
     shutil.move(old_file, new_file)
@@ -257,12 +257,12 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('tool4nanobio', gui_name)
+    new_text = myfile.read().replace('pc2gui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
 #--------------
-old_file = 'tool4nanobio.ipynb'
+old_file = 'pc2gui.ipynb'
 new_file = gui_name + '.ipynb'
 try:
     shutil.move(old_file, new_file)
@@ -272,7 +272,7 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('tool4nanobio', gui_name)
+    new_text = myfile.read().replace('pc2gui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
