@@ -92,7 +92,7 @@ The reason we edit this file in-place is to retain its executable mode. It shoul
 
 Before you request to have your tool installed on nanoHUB, you need to make sure the ```invoke``` file in the ```middleware``` subdirectory is executable:
 
-![alt ensure executable](https://github.com/rheiland/PhysiCell-Jupyter-GUI/blob/master/doc/invoke_file_exec_mode.png)
+![alt ensure executable](doc/invoke_file_exec_mode.png)
 
 If you are using Windows, this file seems to lose its "executable" permission when you commit it. You will need to ```cd``` into the ```middleware``` folder of your newly created project and, using ```git``` from the command line:
 ```
