@@ -165,14 +165,14 @@ print('gui_name=',gui_name)
 # NOTE: let's not do this now; rather edit the invoke script *on* github to avoid 
 #        the (Windows) problem of making it a non-executable file
 with open('middleware/invoke', 'r') as myfile:
-#   new_text = myfile.read().replace('pc2gui', gui_name)
+#   new_text = myfile.read().replace('mygui', gui_name)
    new_text = myfile.read().replace("-t mygui", "-t " + tool_name)
    new_text = new_text.replace("mygui", gui_name)
 with open('middleware/invoke', 'w') as myfile:
    myfile.write(new_text)
 
 #--------------
-old_file = os.path.join("bin", 'pc2gui.py')
+old_file = os.path.join("bin", 'mygui.py')
 new_file = os.path.join("bin", gui_name + '.py')
 try:
     shutil.move(old_file, new_file)
@@ -182,12 +182,12 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('pc2gui', gui_name)
+    new_text = myfile.read().replace('mygui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
 #--------------
-old_file = 'pc2gui.ipynb'
+old_file = 'mygui.ipynb'
 new_file = gui_name + '.ipynb'
 try:
     shutil.move(old_file, new_file)
@@ -197,7 +197,7 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('pc2gui', gui_name)
+    new_text = myfile.read().replace('mygui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
@@ -242,12 +242,12 @@ sys.exit(1)
 # NOTE: let's not do this now; rather edit the invoke script *on* github to avoid 
 #       the (Windows) problem of making it a non-executable file
 #with open('middleware/invoke', 'r') as myfile:
-#    new_text = myfile.read().replace('pc2gui', gui_name)
+#    new_text = myfile.read().replace('mygui', gui_name)
 #with open('middleware/invoke', 'w') as myfile:
 #    myfile.write(new_text)
 
 #--------------
-old_file = os.path.join("bin", 'pc2gui.py')
+old_file = os.path.join("bin", 'mygui.py')
 new_file = os.path.join("bin", gui_name + '.py')
 try:
     shutil.move(old_file, new_file)
@@ -257,12 +257,12 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('pc2gui', gui_name)
+    new_text = myfile.read().replace('mygui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
 #--------------
-old_file = 'pc2gui.ipynb'
+old_file = 'mygui.ipynb'
 new_file = gui_name + '.ipynb'
 try:
     shutil.move(old_file, new_file)
@@ -272,7 +272,7 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('pc2gui', gui_name)
+    new_text = myfile.read().replace('mygui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
