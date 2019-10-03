@@ -2,4 +2,4 @@
 
 /usr/bin/invoke_app "$@" -C "start_jupyter -A -T @tool mygui.ipynb" \
     -t mygui \
-    -u anaconda3-5.1
+    -u anaconda-6
