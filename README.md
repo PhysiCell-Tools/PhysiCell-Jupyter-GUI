@@ -12,8 +12,8 @@ This repository helps auto-generate a Jupyter notebook GUI for PhysiCell-related
 ## Steps to follow
 
 1. Create a new, public repository on github.com and clone it to your computer. This will be your "project repo". Call it whatever you want (it doesn't have to match the name of your eventual nanoHUB tool). If you create a README.md, make a backup copy in case it gets overwritten in the steps below. For the example steps below, we choose the name "ise_proj1".
-2. Clone this tool4nanobio repo to your computer.
-3. In a command line shell window (terminal or command prompt), from the tool4nanobio directory, run the Python script called ```setup_new_proj.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
+2. Clone this PhysiCell-Jupyter-GUI repo to your computer.
+3. In a command line shell window (terminal or command prompt), from the PhysiCell-Jupyter-GUI directory, run the Python script called ```setup_new_proj.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
 ```
 <full-path-to-new-project>  <full-path-to-PhysiCell-project>  <tool name>  [<makefile name>  <main cpp>]
 ```
@@ -21,18 +21,18 @@ The default names of the optional arguments will simply be "Makefile" and "main.
 
 Variations of running the script might be - from a Unix-like shell:
 ```
-~/git/tool4nanobio$ python setup_new_proj.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
-~/git/tool4nanobio$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
+~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
+~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 
-~/git/tool4nanobio$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
+~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
 
-[Windows Git Bash] MINGW64 ~/git/tool4nanobio (master)
+[Windows Git Bash] MINGW64 ~/git/PhysiCell-Jupyter-GUI (master)
 $ python setup_new_proj.py  /c/Users/heiland/git/ise_proj1  /c/Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
 $ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 ```
 from a Windows Command Prompt or PowerShell:
 ```
-C:\Users\heiland\git\tool4nanobio>python setup_new_proj.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
+C:\Users\heiland\git\PhysiCell-Jupyter-GUI>python setup_new_proj.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
 ```
 <!--
 4. From your root directory of your new project repo, run ```make_my_tool.py```, for example:
@@ -67,7 +67,7 @@ Click the ‘Run’ button in the GUI to see if it works. Output files should ap
 
 <!--
 If everything appears to be correct and you want to test and possibly publish your tool on nanoHUB:
-* Delete tool4nanobio.zip in your repo. Optionally, clean up (delete) /src/*.o
+* Delete PhysiCell-Jupyter-GUI.zip in your repo. Optionally, clean up (delete) /src/*.o
 * Commit files to your GitHub repo.
 -->
 
@@ -92,7 +92,7 @@ The reason we edit this file in-place is to retain its executable mode. It shoul
 
 Before you request to have your tool installed on nanoHUB, you need to make sure the ```invoke``` file in the ```middleware``` subdirectory is executable:
 
-![alt ensure executable](https://github.com/rheiland/tool4nanobio/blob/master/doc/invoke_file_exec_mode.png)
+![alt ensure executable](https://github.com/rheiland/PhysiCell-Jupyter-GUI/blob/master/doc/invoke_file_exec_mode.png)
 
 If you are using Windows, this file seems to lose its "executable" permission when you commit it. You will need to ```cd``` into the ```middleware``` folder of your newly created project and, using ```git``` from the command line:
 ```
@@ -105,7 +105,7 @@ then view/refresh the ```invoke``` file from your browser and verify "Executable
 * From the status page of your new tool on nanoHUB (e.g., https://nanohub.org/tools/iu399sp19p099/status), click the link to have it installed for testing (below the "We are waiting for You"). (You must be logged in to nanoHUB). Wait "1-3 days" for that to happen (typically, it's usually within minutes or hours). You'll receive an email from nanoHUB when the tool is installed.
 
 The following is a screenshot of a nanoHUB tool's status page:
-![alt tool status page](https://github.com/rheiland/tool4nanobio/blob/master/doc/nanohub_tool_status_page-med.png)
+![alt tool status page](https://github.com/rheiland/PhysiCell-Jupyter-GUI/blob/master/doc/nanohub_tool_status_page-med.png)
 
 * After your tool in installed and you have tested it and feel like it’s ready to publish, click the link on your tool’s status page that you approve it (for publishing). But as the above screenshot says, you will first need to create a description of your tool. You will eventually be asked to provide the license for your tool and check a box to verify the license is indeed correct. You'll receive an automated email from nanoHUB saying the tool status changed from "Created to Uploaded". The nanoHUB sys admin will then need to compile your code and deploy it there. You will receive another email when the tool is ready to test on nanoHUB.
 
@@ -113,7 +113,7 @@ The following is a screenshot of a nanoHUB tool's status page:
 
 In more detail, the ```setup_new_proj.py``` script should:
 
-* Copy the contents of the tool4nanobio repo to your newly created repo (but NOT the hidden ```.git``` directory!)
+* Copy the contents of the PhysiCell-Jupyter-GUI repo to your newly created repo (but NOT the hidden ```.git``` directory!)
 
 * Copy the relevant files from your PhysiCell model into the new repo's /src directory. Basically, you need to get all of your PhysiCell code (and directory structure) into /src so that when you type ```make``` there, it will build your project. For example, one would typically do: <!-- the following (there's a Python script in /src called ```copy_myproj.py``` that should perform these copies - see Example Steps below): -->
 
@@ -178,13 +178,13 @@ Cloning into 'ise_proj1'...
 warning: You appear to have cloned an empty repository.
 ~/git$ cd ise_proj1/
 
-~/git/ise_proj1$ cp -R ~/git/tool4nanobio/* .
+~/git/ise_proj1$ cp -R ~/git/PhysiCell-Jupyter-GUI/* .
 
 ~/git/ise_proj1$ ls
 LICENSE.txt		doc/			rappture/
 README.md		examples/		src/
 bin/			make_my_tool.py		tmpdir/
-data/			middleware/		tool4nanobio.ipynb
+data/			middleware/		pc2gui.ipynb
 
 ~/git/ise_proj1$ cd src
 ~/git/ise_proj1/src$ ls
@@ -234,9 +234,9 @@ Usage: %s <your repo name>
 ~/git/ise_proj1$ python make_my_tool.py ise_proj1
 num_args= 2
 toolname= ise_proj1
-Renaming  bin/tool4nanobio.py  to  bin/ise_proj1.py
+Renaming  bin/pc2gui.py  to  bin/ise_proj1.py
 Replacing toolname in  bin/ise_proj1.py
-Renaming  tool4nanobio.ipynb  to  ise_proj1.ipynb
+Renaming  pc2gui.ipynb  to  ise_proj1.ipynb
 Replacing toolname in  ise_proj1.ipynb
 Trying to run xml2jupyter.py on your .xml file in /data
 num_args= 2
