@@ -13,7 +13,7 @@ This repository helps auto-generate a Jupyter notebook GUI for PhysiCell-related
 
 1. Create a new, public repository on github.com and clone it to your computer. This will be your "project repo". Call it whatever you want (it doesn't have to match the name of your eventual nanoHUB tool). If you create a README.md, make a backup copy in case it gets overwritten in the steps below. For the example steps below, we choose the name "ise_proj1".
 2. Clone this PhysiCell-Jupyter-GUI repo to your computer.
-3. In a command line shell window (terminal or command prompt), from the PhysiCell-Jupyter-GUI directory, run the Python script called ```setup_new_proj.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
+3. In a command line shell window (terminal or command prompt), from the PhysiCell-Jupyter-GUI directory, run the Python script called ```pc2gui.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
 ```
 <full-path-to-new-project>  <full-path-to-PhysiCell-project>  <tool name>  [<makefile name>  <main cpp>]
 ```
@@ -21,18 +21,18 @@ The default names of the optional arguments will simply be "Makefile" and "main.
 
 Variations of running the script might be - from a Unix-like shell:
 ```
-~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
-~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
+~/git/PhysiCell-Jupyter-GUI$ python pc2gui.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
+~/git/PhysiCell-Jupyter-GUI$ python pc2gui.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 
-~/git/PhysiCell-Jupyter-GUI$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
+~/git/PhysiCell-Jupyter-GUI$ python pc2gui.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
 
 [Windows Git Bash] MINGW64 ~/git/PhysiCell-Jupyter-GUI (master)
-$ python setup_new_proj.py  /c/Users/heiland/git/ise_proj1  /c/Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
-$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
+$ python pc2gui.py  /c/Users/heiland/git/ise_proj1  /c/Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
+$ python pc2gui.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 ```
 from a Windows Command Prompt or PowerShell:
 ```
-C:\Users\heiland\git\PhysiCell-Jupyter-GUI>python setup_new_proj.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
+C:\Users\heiland\git\PhysiCell-Jupyter-GUI>python pc2gui.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
 ```
 <!--
 4. From your root directory of your new project repo, run ```make_my_tool.py```, for example:
@@ -111,7 +111,7 @@ The following is a screenshot of a nanoHUB tool's status page:
 
 ## Details of the above scripts (if you care)
 
-In more detail, the ```setup_new_proj.py``` script should:
+In more detail, the ```pc2gui.py``` script should:
 
 * Copy the contents of the PhysiCell-Jupyter-GUI repo to your newly created repo (but NOT the hidden ```.git``` directory!)
 
