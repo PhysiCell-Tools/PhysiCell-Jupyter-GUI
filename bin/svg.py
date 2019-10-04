@@ -43,8 +43,8 @@ class SVGTab(object):
         max_frames = 1
         self.svg_plot = interactive(self.plot_svg, frame=(0, max_frames), continuous_update=False)
         plot_size = '500px'  # small: controls the size of the tab height, not the plot (rf. figsize for that)
-        plot_size = '700px'  # medium
         plot_size = '750px'  # medium
+        plot_size = '700px'  # medium
         self.svg_plot.layout.width = plot_size
         self.svg_plot.layout.height = plot_size
         self.use_defaults = True
@@ -353,7 +353,7 @@ class SVGTab(object):
         # self.fig = plt.figure(figsize=(7, 7))
         # self.fig = plt.figure(figsize=(9, 9))
         # self.fig = plt.figure(figsize=(18, 18))
-        self.fig = plt.figure(figsize=(15, 15))
+        self.fig = plt.figure(figsize=(14, 14))
 
 #        axx = plt.axes([0, 0.05, 0.9, 0.9])  # left, bottom, width, height
 #        axx = fig.gca()

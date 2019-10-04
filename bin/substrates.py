@@ -53,6 +53,8 @@ class SubstrateTab(object):
         self.mcds_plot.layout.width = svg_plot_size
         self.mcds_plot.layout.height = svg_plot_size
 
+        self.fontsize = 20
+
         self.max_frames = BoundedIntText(
             min=0, max=99999, value=max_frames,
             description='Max',
@@ -348,7 +350,8 @@ class SubstrateTab(object):
         # plt.clf()
         # my_plot = plt.imshow(f.reshape(400,400), cmap='jet', extent=[0,20, 0,20])
     
-        self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
+        # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
+        self.fig = plt.figure(figsize=(24,20))  # this strange figsize results in a ~square contour plot
         #     fig.set_tight_layout(True)
         #     ax = plt.axes([0, 0.05, 0.9, 0.9 ]) #left, bottom, width, height
         #     ax = plt.axes([0, 0.0, 1, 1 ])
@@ -390,8 +393,17 @@ class SubstrateTab(object):
                 # print('got error on contourf 2.')
 
         if (contour_ok):
-            plt.title(title_str)
-            plt.colorbar(my_plot)
+            plt.title(title_str, fontsize=self.fontsize)
+            plt.tick_params(labelsize=self.fontsize)
+            # plt.colorbar(my_plot)
+            cbar = plt.colorbar(my_plot)
+            cbar.ax.tick_params(labelsize=self.fontsize)
+
+        #     main_ax.set_title(title_str, fontsize=self.fontsize)
+        #     main_ax.tick_params(labelsize=self.fontsize)
+        #    # cbar = plt.colorbar(my_plot)
+        #     cbar = self.fig.colorbar(substrate_plot, ax=main_ax)
+        #     cbar.ax.tick_params(labelsize=self.fontsize)
         axes_min = 0
         axes_max = 2000
         # plt.xlim(axes_min, axes_max)
