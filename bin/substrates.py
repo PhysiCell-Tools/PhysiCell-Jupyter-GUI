@@ -50,6 +50,7 @@ class SubstrateTab(object):
         max_frames = 1   
         self.mcds_plot = interactive(self.plot_substrate, frame=(0, max_frames), continuous_update=False)  
         svg_plot_size = '700px'
+        # svg_plot_size = '680px'
         self.mcds_plot.layout.width = svg_plot_size
         self.mcds_plot.layout.height = svg_plot_size
 
@@ -351,7 +352,9 @@ class SubstrateTab(object):
         # my_plot = plt.imshow(f.reshape(400,400), cmap='jet', extent=[0,20, 0,20])
     
         # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
-        self.fig = plt.figure(figsize=(24,20))  # this strange figsize results in a ~square contour plot
+        # self.fig = plt.figure(figsize=(24,20))  # this strange figsize results in a ~square contour plot
+        self.fig = plt.figure(figsize=(28.8,24))  # this strange figsize results in a ~square contour plot
+        # self.fig = plt.figure(figsize=(28,24))  # this strange figsize results in a ~square contour plot
         #     fig.set_tight_layout(True)
         #     ax = plt.axes([0, 0.05, 0.9, 0.9 ]) #left, bottom, width, height
         #     ax = plt.axes([0, 0.0, 1, 1 ])

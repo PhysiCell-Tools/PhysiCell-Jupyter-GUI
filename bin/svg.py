@@ -44,7 +44,7 @@ class SVGTab(object):
         self.svg_plot = interactive(self.plot_svg, frame=(0, max_frames), continuous_update=False)
         plot_size = '500px'  # small: controls the size of the tab height, not the plot (rf. figsize for that)
         plot_size = '750px'  # medium
-        plot_size = '700px'  # medium
+        plot_size = '650px'  # medium
         self.svg_plot.layout.width = plot_size
         self.svg_plot.layout.height = plot_size
         self.use_defaults = True
