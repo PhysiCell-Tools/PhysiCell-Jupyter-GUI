@@ -19,7 +19,7 @@ This repository helps auto-generate a Jupyter notebook GUI for PhysiCell-related
 ```
 The default names of the optional arguments will simply be "Makefile" and "main.cpp".
 
-Variations of running the script might be - from a Unix-like shell:
+Variations of running the script might be - from a Unix-like shell (note that the <tool name> used here reflects a class project):
 ```
 ~/git/PhysiCell-Jupyter-GUI$ python pc2gui.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
 ~/git/PhysiCell-Jupyter-GUI$ python pc2gui.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
