@@ -35,6 +35,7 @@ print('proj_fullpath = ',proj_fullpath)
 
 #proj_name = sys.argv[2]
 proj_name = os.path.basename(proj_fullpath)
+proj_name = proj_name.replace('-','_')
 print('proj_name = ',proj_name)
 
 physicell_fullpath= sys.argv[2]
@@ -63,8 +64,11 @@ for elm in os.listdir('.'):
                 # shutil.copytree(elm, os.path.join(proj_fullpath, elm))        # (from_dir, to_dir)
                 shutil.copytree(from_dir, to_dir)
             else:
-                if (elm == sys.argv[0] or elm == "README.md"):
-                    # print('------- skipping over ',elm)
+                if (elm == sys.argv[0]):
+                    print('------- skipping over (not copying) sys.argv[0] ',sys.argv[0])
+                    continue
+                elif (elm == "README.md"):
+                    print('------- skipping over (not copying) ',elm)
                     continue
                 from_file = elm
                 to_file = os.path.join(proj_fullpath, elm)        # (from_file, to_file)
@@ -158,7 +162,8 @@ print("\n\n STEP 3: renaming files and file content to have new project and tool
 print("\n----- Now we will prepare your new project. ")
 os.chdir(proj_fullpath)
 
-gui_name = os.path.basename(proj_fullpath)
+#gui_name = os.path.basename(proj_fullpath)
+gui_name = proj_name
 print('gui_name=',gui_name)
 
 

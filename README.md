@@ -12,7 +12,7 @@ This repository helps auto-generate a Jupyter notebook GUI for PhysiCell-related
 ## Steps to follow
 
 1. Create a new, public repository on github.com and clone it to your computer. This will be your "project repo". Call it whatever you want (it doesn't have to match the name of your eventual nanoHUB tool). If you create a README.md, make a backup copy in case it gets overwritten in the steps below. For the example steps below, we choose the name "ise_proj1".
-2. Clone this PhysiCell-Jupyter-GUI repo to your computer.
+2. Clone (or download the latest Release of) this PhysiCell-Jupyter-GUI repo to your computer.
 3. In a command line shell window (terminal or command prompt), from the PhysiCell-Jupyter-GUI directory, run the Python script called ```pc2gui.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
 ```
 <full-path-to-new-project>  <full-path-to-PhysiCell-project>  <tool name>  [<makefile name>  <main cpp>]
