@@ -105,7 +105,7 @@ then view/refresh the ```invoke``` file from your browser and verify "Executable
 * From the status page of your new tool on nanoHUB (e.g., https://nanohub.org/tools/iu399sp19p099/status), click the link to have it installed for testing (below the "We are waiting for You"). (You must be logged in to nanoHUB). Wait "1-3 days" for that to happen (typically, it's usually within minutes or hours). You'll receive an email from nanoHUB when the tool is installed.
 
 The following is a screenshot of a nanoHUB tool's status page:
-![alt tool status page](https://github.com/rheiland/PhysiCell-Jupyter-GUI/blob/master/doc/nanohub_tool_status_page-med.png)
+![alt tool status page](doc/nanohub_tool_status_page-med.png)
 
 * After your tool in installed and you have tested it and feel like it’s ready to publish, click the link on your tool’s status page that you approve it (for publishing). But as the above screenshot says, you will first need to create a description of your tool. You will eventually be asked to provide the license for your tool and check a box to verify the license is indeed correct. You'll receive an automated email from nanoHUB saying the tool status changed from "Created to Uploaded". The nanoHUB sys admin will then need to compile your code and deploy it there. You will receive another email when the tool is ready to test on nanoHUB.
 
