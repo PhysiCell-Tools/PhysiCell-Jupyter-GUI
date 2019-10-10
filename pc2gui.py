@@ -36,6 +36,7 @@ print('proj_fullpath = ',proj_fullpath)
 #proj_name = sys.argv[2]
 proj_name = os.path.basename(proj_fullpath)
 proj_name = proj_name.replace('-','_')
+proj_name = proj_name.replace('.','_')
 print('proj_name = ',proj_name)
 
 physicell_fullpath= sys.argv[2]
@@ -187,7 +188,8 @@ except:
 
 print('Replacing gui_name in ',new_file)
 with open(new_file, 'r') as myfile:
-    new_text = myfile.read().replace('mygui', gui_name)
+    new_text = myfile.read().replace('mygui-toolname', tool_name)
+    new_text = new_text.replace('mygui', gui_name)
 with open(new_file, 'w') as myfile:
     myfile.write(new_text)
 
