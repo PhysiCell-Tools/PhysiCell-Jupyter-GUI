@@ -55,7 +55,9 @@ shutil.copy(".travis.yml", to_file)
 
 for elm in os.listdir('.'):
     try:
-        if (elm[0] != '.'):  # avoid /.git, etc
+        if ('Example_GUI' in elm):  # avoid /.git, etc
+            continue
+        elif (elm[0] != '.'):  # avoid /.git, etc
             if os.path.isdir(elm):
                 from_dir = elm
                 to_dir = os.path.join(proj_fullpath, elm)
