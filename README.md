@@ -2,6 +2,14 @@
 This repository helps auto-generate a Jupyter notebook GUI for PhysiCell-related models and output. The directory structure and content of the repository matches a template required for a [nanoHUB](https://nanohub.org/) tool installation. However, creating an actual nanoHUB tool is optional; the GUI created here should also work (with fewer bells & whistles, perhaps) on your personal computer, assuming you have the required Python modules and are able to run a Jupyter notebook server.
 
 It also contains a directory of example GUIs that have been generated using this process. See `Example_GUIs`.
+So, after cloning this repo, you should be able to at least run an example notebook and see the GUI, even though
+you won't be able to 'Run' a simulation since that would require compiling the code (the PhysiCell model)
+and copying certain files to appropriate locations, as described below. To run an example notebook:
+```
+#---- clone this repo, then from a shell window:
+$ cd Example_GUIs/pc4biorobots
+$ jupyter notebook pc4biorobots.ipynb
+```
 
 
 ## Dependencies/Requirements
