@@ -562,9 +562,6 @@ class SubstrateTab(object):
     def update_max_frames(self,_b):
         self.i_plot.children[0].max = self.max_frames.value
 
-    def dummy_cb(self, b):
-        return
-
     # called if user selected different substrate in dropdown
     def mcds_field_changed_cb(self, b):
         # print("mcds_field_changed_cb: self.mcds_field.value=",self.mcds_field.value)
