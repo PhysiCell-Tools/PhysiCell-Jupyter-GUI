@@ -81,6 +81,8 @@ class SubstrateTab(object):
         self.field_index = 4
         # self.field_index = self.mcds_field.value + 4
 
+        self.skip_cb = False
+
         # define dummy size of mesh (set in the tool's primary module)
         self.numx = 0
         self.numy = 0
@@ -118,9 +120,9 @@ class SubstrateTab(object):
         )
         self.max_frames.observe(self.update_max_frames)
 
-        # self.field_min_max = {'dummy': [0., 1.]}
+        # self.field_min_max = {'dummy': [0., 1., False]}
         # NOTE: manually setting these for now (vs. parsing them out of data/initial.xml)
-        self.field_min_max = {'director signal':[0.,1.], 'cargo signal':[0.,1.] }
+        self.field_min_max = {'director signal':[0.,1.,False], 'cargo signal':[0.,1.,False] }
         # hacky I know, but make a dict that's got (key,value) reversed from the dict in the Dropdown below
         # self.field_dict = {0:'dummy'}
         self.field_dict = {0:'director signal', 1:'cargo signal'}
@@ -135,12 +137,6 @@ class SubstrateTab(object):
 #        self.mcds_field.observe(self.mcds_field_cb)
         self.mcds_field.observe(self.mcds_field_changed_cb)
 
-        # self.field_cmap = Text(
-        #     value='viridis',
-        #     description='Colormap',
-        #     disabled=True,
-        #     layout=Layout(width=constWidth),
-        # )
         self.field_cmap = Dropdown(
             options=['viridis', 'jet', 'YlOrRd'],
             value='YlOrRd',
@@ -150,31 +146,49 @@ class SubstrateTab(object):
 #        self.field_cmap.observe(self.plot_substrate)
         self.field_cmap.observe(self.mcds_field_cb)
 
-        self.cmap_fixed = Checkbox(
+        self.cmap_fixed_toggle = Checkbox(
             description='Fix',
             disabled=False,
 #           layout=Layout(width=constWidth2),
         )
+        self.cmap_fixed_toggle.observe(self.mcds_field_cb)
 
-        self.save_min_max= Button(
-            description='Save', #style={'description_width': 'initial'},
-            button_style='success',  # 'success', 'info', 'warning', 'danger' or ''
-            tooltip='Save min/max for this substrate',
-            disabled=True,
-           layout=Layout(width='90px')
-        )
+#         def cmap_fixed_toggle_cb(b):
+#             # self.update()
+# #            self.field_min_max = {'oxygen': [0., 30.,True], 'glucose': [0., 1.,False]}
+#             field_name = self.field_dict[self.mcds_field.value]
+#             if (self.cmap_fixed_toggle.value):  
+#                 self.field_min_max[field_name][0] = self.cmap_min.value
+#                 self.field_min_max[field_name][1] = self.cmap_max.value
+#                 self.field_min_max[field_name][2] = True
+#             else:
+#                 # self.field_min_max[field_name][0] = self.cmap_min.value
+#                 # self.field_min_max[field_name][1] = self.cmap_max.value
+#                 self.field_min_max[field_name][2] = False
+#             self.i_plot.update()
 
-        def save_min_max_cb(b):
-#            field_name = self.mcds_field.options[]
-#            field_name = next(key for key, value in self.mcds_field.options.items() if value == self.mcds_field.value)
-            field_name = self.field_dict[self.mcds_field.value]
-#            print(field_name)
-#            self.field_min_max = {'oxygen': [0., 30.], 'glucose': [0., 1.], 'H+ ions': [0., 1.], 'ECM': [0., 1.], 'NP1': [0., 1.], 'NP2': [0., 1.]}
-            self.field_min_max[field_name][0] = self.cmap_min.value
-            self.field_min_max[field_name][1] = self.cmap_max.value
-#            print(self.field_min_max)
+        # self.cmap_fixed_toggle.observe(cmap_fixed_toggle_cb)
 
-        self.save_min_max.on_click(save_min_max_cb)
+#         self.save_min_max= Button(
+#             description='Save', #style={'description_width': 'initial'},
+#             button_style='success',  # 'success', 'info', 'warning', 'danger' or ''
+#             tooltip='Save min/max for this substrate',
+#             disabled=True,
+#            layout=Layout(width='90px')
+#         )
+
+#         def save_min_max_cb(b):
+# #            field_name = self.mcds_field.options[]
+# #            field_name = next(key for key, value in self.mcds_field.options.items() if value == self.mcds_field.value)
+#             field_name = self.field_dict[self.mcds_field.value]
+# #            print(field_name)
+# #            self.field_min_max = {'oxygen': [0., 30.], 'glucose': [0., 1.], 'H+ ions': [0., 1.], 'ECM': [0., 1.], 'NP1': [0., 1.], 'NP2': [0., 1.]}
+#             self.field_min_max[field_name][0] = self.cmap_min.value
+#             self.field_min_max[field_name][1] = self.cmap_max.value
+# #            print(self.field_min_max)
+
+#         self.save_min_max.on_click(save_min_max_cb)
+
 
         self.cmap_min = FloatText(
             description='Min',
@@ -194,24 +208,31 @@ class SubstrateTab(object):
         )
         self.cmap_max.observe(self.mcds_field_cb)
 
-        def cmap_fixed_cb(b):
-            if (self.cmap_fixed.value):
+        def cmap_fixed_toggle_cb(b):
+            field_name = self.field_dict[self.mcds_field.value]
+            # print(self.cmap_fixed_toggle.value)
+            if (self.cmap_fixed_toggle.value):  # toggle on fixed range
                 self.cmap_min.disabled = False
                 self.cmap_max.disabled = False
-                self.save_min_max.disabled = False
-            else:
+                self.field_min_max[field_name][0] = self.cmap_min.value
+                self.field_min_max[field_name][1] = self.cmap_max.value
+                self.field_min_max[field_name][2] = True
+                # self.save_min_max.disabled = False
+            else:  # toggle off fixed range
                 self.cmap_min.disabled = True
                 self.cmap_max.disabled = True
-                self.save_min_max.disabled = True
+                self.field_min_max[field_name][2] = False
+                # self.save_min_max.disabled = True
 #            self.mcds_field_cb()
+            self.i_plot.update()
 
-        self.cmap_fixed.observe(cmap_fixed_cb)
+        self.cmap_fixed_toggle.observe(cmap_fixed_toggle_cb)
 
-        field_cmap_row2 = HBox([self.field_cmap, self.cmap_fixed])
+        field_cmap_row2 = HBox([self.field_cmap, self.cmap_fixed_toggle])
 
 #        field_cmap_row3 = HBox([self.save_min_max, self.cmap_min, self.cmap_max])
         items_auto = [
-            self.save_min_max, #layout=Layout(flex='3 1 auto', width='auto'),
+            # self.save_min_max, #layout=Layout(flex='3 1 auto', width='auto'),
             self.cmap_min, 
             self.cmap_max,  
          ]
@@ -220,6 +241,13 @@ class SubstrateTab(object):
                     align_items='stretch',
                     width='80%')
         field_cmap_row3 = Box(children=items_auto, layout=box_layout)
+
+        # self.debug_str = Text(
+        #     value='debug info',
+        #     description='Debug:',
+        #     disabled=True,
+        #     layout=Layout(width='600px'),  #constWidth = '180px'
+        # )
 
         #---------------------
         self.cell_nucleus_toggle = Checkbox(
@@ -282,13 +310,13 @@ class SubstrateTab(object):
         )
         def substrates_toggle_cb(b):
             if (self.substrates_toggle.value):  # seems bass-ackwards
-                self.cmap_fixed.disabled = False
+                self.cmap_fixed_toggle.disabled = False
                 self.cmap_min.disabled = False
                 self.cmap_max.disabled = False
                 self.mcds_field.disabled = False
                 self.field_cmap.disabled = False
             else:
-                self.cmap_fixed.disabled = True
+                self.cmap_fixed_toggle.disabled = True
                 self.cmap_min.disabled = True
                 self.cmap_max.disabled = True
                 self.mcds_field.disabled = True
@@ -332,7 +360,7 @@ class SubstrateTab(object):
                             display='flex')) 
         row1 = HBox( [row1a, Label('.....'), row1b])
 
-        row2a = Box([self.cmap_fixed, self.cmap_min, self.cmap_max], layout=Layout(border='1px solid black',
+        row2a = Box([self.cmap_fixed_toggle, self.cmap_min, self.cmap_max], layout=Layout(border='1px solid black',
                             width='50%',
                             height='',
                             align_items='stretch',
@@ -359,6 +387,7 @@ class SubstrateTab(object):
             # box_layout = Layout(border='0px solid')
             controls_box = VBox([row1, row2])  # ,width='50%', layout=box_layout)
             self.tab = VBox([controls_box, self.i_plot, download_row])
+            # self.tab = VBox([controls_box, self.debug_str, self.i_plot, download_row])
         else:
             # self.tab = VBox([row1, row2])
             self.tab = VBox([row1, row2, self.i_plot])
@@ -386,14 +415,23 @@ class SubstrateTab(object):
         if (uep):
             for elm in uep.findall('variable'):
                 # print("-----> ",elm.attrib['name'])
-                self.field_min_max[elm.attrib['name']] = [0., 1.]
-                self.field_dict[field_idx] = elm.attrib['name']
-                dropdown_options[elm.attrib['name']] = field_idx
+                field_name = elm.attrib['name']
+                self.field_min_max[field_name] = [0., 1., False]
+                self.field_dict[field_idx] = field_name
+                dropdown_options[field_name] = field_idx
+
+                self.field_min_max[field_name][0] = 0   
+                self.field_min_max[field_name][1] = 1
+
+                # self.field_min_max[field_name][0] = field_idx   #rwh: helps debug
+                # self.field_min_max[field_name][1] = field_idx+1   
+                self.field_min_max[field_name][2] = False
                 field_idx += 1
 
 #        constWidth = '180px'
         # print('options=',dropdown_options)
-        self.mcds_field.value=0
+        # print(self.field_min_max)  # debug
+        self.mcds_field.value = 0
         self.mcds_field.options = dropdown_options
 #         self.mcds_field = Dropdown(
 # #            options={'oxygen': 0, 'glucose': 1},
@@ -524,6 +562,10 @@ class SubstrateTab(object):
     def update_max_frames(self,_b):
         self.i_plot.children[0].max = self.max_frames.value
 
+    def dummy_cb(self, b):
+        return
+
+    # called if user selected different substrate in dropdown
     def mcds_field_changed_cb(self, b):
         # print("mcds_field_changed_cb: self.mcds_field.value=",self.mcds_field.value)
         if (self.mcds_field.value == None):
@@ -531,23 +573,45 @@ class SubstrateTab(object):
         self.field_index = self.mcds_field.value + 4
 
         field_name = self.field_dict[self.mcds_field.value]
-        # print('mcds_field_cb: '+field_name)
+        # print('mcds_field_changed_cb: field_name='+ field_name)
+        # print(self.field_min_max[field_name])
+        # self.debug_str.value = 'mcds_field_changed_cb: '+ field_name  + str(self.field_min_max[field_name])
+        # self.debug_str.value = 'cb1: '+ str(self.field_min_max)
+
+        # BEWARE of these triggering the mcds_field_cb() callback! Hence, the "skip_cb"
+        self.skip_cb = True
         self.cmap_min.value = self.field_min_max[field_name][0]
         self.cmap_max.value = self.field_min_max[field_name][1]
+        self.cmap_fixed_toggle.value = bool(self.field_min_max[field_name][2])
+        self.skip_cb = False
+
         self.i_plot.update()
 
+    # called if user provided different min/max values for colormap, or a different colormap
     def mcds_field_cb(self, b):
-        #self.field_index = self.mcds_field.value
-#        self.field_index = self.mcds_field.options.index(self.mcds_field.value) + 4
-#        self.field_index = self.mcds_field.options[self.mcds_field.value]
+        if self.skip_cb:
+            return
+
         self.field_index = self.mcds_field.value + 4
+
+        field_name = self.field_dict[self.mcds_field.value]
+        # print('mcds_field_cb: field_name='+ field_name)
+
+        # print('mcds_field_cb: '+ field_name)
+        self.field_min_max[field_name][0] = self.cmap_min.value 
+        self.field_min_max[field_name][1] = self.cmap_max.value
+        self.field_min_max[field_name][2] = self.cmap_fixed_toggle.value
+        # print(self.field_min_max[field_name])
+        # self.debug_str.value = 'mcds_field_cb: ' + field_name + str(self.field_min_max[field_name])
+        # self.debug_str.value = 'cb2: '+ str(self.field_min_max)
+        # print('--- cb2: '+ str(self.field_min_max))  #rwh2
+        # self.cmap_fixed_toggle.value = self.field_min_max[field_name][2]
 
         # field_name = self.mcds_field.options[self.mcds_field.value]
         # self.cmap_min.value = self.field_min_max[field_name][0]  # oxygen, etc
         # self.cmap_max.value = self.field_min_max[field_name][1]  # oxygen, etc
 
 #        self.field_index = self.mcds_field.value + 4
-
 #        print('field_index=',self.field_index)
         self.i_plot.update()
 
@@ -959,7 +1023,7 @@ class SubstrateTab(object):
             num_contours = 15
             levels = MaxNLocator(nbins=num_contours).tick_values(self.cmap_min.value, self.cmap_max.value)
             contour_ok = True
-            if (self.cmap_fixed.value):
+            if (self.cmap_fixed_toggle.value):
                 try:
                     # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                     substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
