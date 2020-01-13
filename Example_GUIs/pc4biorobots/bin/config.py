@@ -72,10 +72,12 @@ class ConfigTab(object):
             disabled = disable_domain,
             layout=Layout(width=constWidth),
         )
+
+
         self.ydelta = BoundedFloatText(
             min=1.,
             description='dy',
-            disabled = disable_domain,
+            disabled = True,
             layout=Layout(width=constWidth),
         )
         self.zdelta = BoundedFloatText(
@@ -84,6 +86,16 @@ class ConfigTab(object):
             disabled = disable_domain,
             layout=Layout(width=constWidth),
         )
+
+        def xdelta_cb(b):
+            self.ydelta.value = self.xdelta.value
+            self.zdelta.value = 0.5 * (self.xdelta.value + self.ydelta.value)
+            self.zmin.value = -0.5 * self.zdelta.value 
+            self.zmax.value = 0.5 * self.zdelta.value 
+
+        self.xdelta.observe(xdelta_cb)  
+
+
         """
         self.tdelta = BoundedFloatText(
             min=0.01,
