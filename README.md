@@ -22,8 +22,8 @@ $ jupyter notebook pc4biorobots.ipynb
 ## Steps to follow
 
 1. Create a new, public repository on github.com (not the IU github) and clone it to your computer. This will be your "project repo". Call it whatever you want (it doesn't have to match the name of your eventual nanoHUB tool). If you create a README.md, make a backup copy in case it gets overwritten in the steps below. For the example steps below, we choose the name "ise_proj1".
-2. Clone this tool4nanobio repo to your computer.
-3. In a command line shell window (terminal or command prompt), from the tool4nanobio directory, run the Python script called ```setup_new_proj.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
+2. Clone this repo to your computer.
+3. In a command line shell window (terminal or command prompt), from the root directory of this repo, run the Python script called ```setup_new_proj.py```. If successful, this will copy (nearly) all necessary files into your new project repo (step 1). You provide three required arguments (and two optional) to the script:
 ```
 <full-path-to-new-project>  <full-path-to-PhysiCell-project>  <tool name>  [<makefile name>  <main cpp>]
 ```
@@ -31,18 +31,18 @@ The default names of the optional arguments will simply be "Makefile" and "main.
 
 Variations of running the script might be - from a Unix-like shell:
 ```
-~/git/tool4nanobio$ python setup_new_proj.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
-~/git/tool4nanobio$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
+$ python setup_new_proj.py  /Users/heiland/git/ise_proj1  /Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
+$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 
-~/git/tool4nanobio$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
+$ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099 Make_hetero main_hetero.cpp
 
-[Windows Git Bash] MINGW64 ~/git/tool4nanobio (master)
+[Windows Git Bash] MINGW64
 $ python setup_new_proj.py  /c/Users/heiland/git/ise_proj1  /c/Users/heiland/dev/PhysiCell_heterogeneity iu399sp19p099
 $ python setup_new_proj.py  ~/git/ise_proj1  ~/dev/PhysiCell_heterogeneity iu399sp19p099
 ```
 from a Windows Command Prompt or PowerShell:
 ```
-C:\Users\heiland\git\tool4nanobio>python setup_new_proj.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
+>python setup_new_proj.py  C:\Users\heiland\git\ise_proj1  C:\Users\heiland\dev\PhysiCell_heterogeneity iu399sp19p099
 ```
 <!--
 4. From your root directory of your new project repo, run ```make_my_tool.py```, for example:
