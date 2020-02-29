@@ -381,12 +381,6 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
             elif child.attrib['type'] == "string":
                 user_tab_header += indent2 + "value='" + child.text + "',\n"
 
-            # elif child.attrib['type'].lower() == 'divider':
-            #     divider_flag = True
-            #     child.text = "Worker_Parameters"
-            #     # user_tab_header += indent2 + "value=" + child.description + ",\n"
-            #     user_tab_header += indent2 + "value=" + child.attrib['description'] + ",\n"
-
 
             row_name = "row" + str(param_count)
             box_name = "box" + str(param_count)
