@@ -268,22 +268,25 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
 
 #    names_str = ''
 #    units_str = ''
-    describe_str = ''
+    # describe_str = ''
 #    desc_row_name = None
     desc_row_name = ''
     units_btn_name = ''
 
 
-    if 'description' in child.attrib.keys():
-        describe_str = child.attrib['description']
-    else:
-        describe_str = ""
-    desc_row_name = "desc_button" + str(param_count)
-    desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
-    if (param_count % 2):
-        desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname1 + "'\n"
-    else:  # rf.  https://www.w3schools.com/colors/colors_names.asp
-        desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname2 + "'\n"
+    if not divider_flag:
+        if 'description' in child.attrib.keys():
+            describe_str = child.attrib['description']
+        else:
+            describe_str = ""
+        desc_row_name = "desc_button" + str(param_count)
+        desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
+        # print("--- debug: " + desc_row_name + " --> " + describe_str)   #rwh debug
+
+        if (param_count % 2):
+            desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname1 + "'\n"
+        else:  # rf.  https://www.w3schools.com/colors/colors_names.asp
+            desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname2 + "'\n"
 
     if 'units' in child.attrib.keys():
         if child.attrib['units'] != "dimensionless" and child.attrib['units'] != "none":
@@ -316,7 +319,7 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
 #             self.therapy_activation_time = BoundedFloatText(
 #            min=0., max=100000000, step=stepsize,
         full_name = "self." + child.tag
-        name_count += 1
+        # name_count += 1
         if child.attrib['type'] not in widgets.keys():
             print("    *** Error - Invalid type: " + child.attrib['type'])
             sys.exit(1)
@@ -326,6 +329,7 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
                 handle_divider(child)
                 continue
 
+            name_count += 1
             param_name_button = "param_name" + str(name_count)
             user_tab_header += "\n" + indent + param_name_button + " = " + "Button(description='" + child.tag + "', disabled=True, layout=name_button_layout)\n"
             if (param_count % 2):
@@ -380,6 +384,12 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
             # Strings
             elif child.attrib['type'] == "string":
                 user_tab_header += indent2 + "value='" + child.text + "',\n"
+
+            # elif child.attrib['type'].lower() == 'divider':
+            #     divider_flag = True
+            #     child.text = "Worker_Parameters"
+            #     # user_tab_header += indent2 + "value=" + child.description + ",\n"
+            #     user_tab_header += indent2 + "value=" + child.attrib['description'] + ",\n"
 
 
             row_name = "row" + str(param_count)
