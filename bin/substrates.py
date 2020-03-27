@@ -521,7 +521,7 @@ class SubstrateTab(object):
             # self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
             # print("substrates: update(): modulo=",self.modulo)        
             if full_xml_filename.is_file():
-                tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
+                tree = ET.parse(str(full_xml_filename))  # this file cannot be overwritten; part of tool distro
                 xml_root = tree.getroot()
                 self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
                 self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
