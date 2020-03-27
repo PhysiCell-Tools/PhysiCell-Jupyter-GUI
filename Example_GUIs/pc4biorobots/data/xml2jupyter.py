@@ -280,7 +280,7 @@ for child in uep:   # uep = "unique entry point" for <user_parameters> (from abo
         else:
             describe_str = ""
         desc_row_name = "desc_button" + str(param_count)
-        desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
+        desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "' , tooltip='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
         # print("--- debug: " + desc_row_name + " --> " + describe_str)   #rwh debug
 
         if (param_count % 2):
