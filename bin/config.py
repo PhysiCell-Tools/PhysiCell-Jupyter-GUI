@@ -68,7 +68,7 @@ class ConfigTab(object):
         )
         self.xdelta = BoundedFloatText(
             min=1.,
-            description='dx',   # '∆x',  # Mac: opt-j for delta
+            description='dx',   # 'dx',  # Mac: opt-j for delta
             disabled = disable_domain,
             layout=Layout(width=constWidth),
         )
