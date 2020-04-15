@@ -13,6 +13,7 @@ from user_params import UserTab
 # from svg import SVGTab
 from substrates import SubstrateTab
 from animate_tab import AnimateTab
+from animate_tab import AnimateTab
 from pathlib import Path
 import platform
 import subprocess
@@ -285,7 +286,7 @@ def run_sim_func(s):
     # svg.update(tdir)
     # sub.update_params(config_tab)
     sub.update(tdir)
-    animate_tab.update(tdir)
+    # animate_tab.update(tdir)
 
     if nanoHUB_flag:
         if remote_cb.value:
@@ -411,7 +412,7 @@ output_dir = "tmpdir"
 # svg.update(output_dir)
 
 sub.update_dropdown_fields("data")   # WARNING: generates multiple "<Figure size...>" stdout!
-animate_tab.update_dropdown_fields("data")   
+# animate_tab.update_dropdown_fields("data")   
 
 # print('config_tab.svg_interval.value= ',config_tab.svg_interval.value )
 # print('config_tab.mcds_interval.value= ',config_tab.mcds_interval.value )

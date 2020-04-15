@@ -1,6 +1,5 @@
 from ipywidgets import Button, Label, BoundedIntText, HBox, VBox, Output, HTML, Layout
 from IPython.display import display
-# from IPython.display import HTML 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from PIL import Image
@@ -28,23 +27,10 @@ else:
 class AnimateTab(object):
 
     def __init__(self):
-        # self.tab = Output(layout={'height': '600px'})
-        # self.tab = Output(layout={'height': 'auto'})
-
-        # self.first_time = True
         self.mp4_zip_file = "cells_mp4.zip"
-        # self.avi_zip_file = "cells_avi.zip"
-        # self.avi_file = "cells.avi"
         self.mp4_file = "cells.mp4"
 
-        # self.output_dir = "tmpdir"
-        # self.output_dir = os.path.abspath('tmpdir')
-        # self.fig = plt.figure(figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
-        # self.fig = plt.figure(figsize=(12,12))
-
         self.instructions = Label("After a simulation completes, generate a video of cells (from SVG files). Does not work for cached results yet.")
-        # self.instructions = Label("After a simulation completes, generate videos of cells (from SVG files). Does not work for cached results yet.")
-        # self.instructions2 = Label("Both mp4 (played here) and avi formats are created. Only the avi obeys the fps.")
         self.feedback = Label("                            ")
         # self.feedback.value = "Converting all svg to jpg..."
 
@@ -54,7 +40,6 @@ class AnimateTab(object):
             tooltip='Generate a MP4 video of cells',
         )
         self.gen_button.disabled = True
-        # self.gen_button.disabled = False
         self.gen_button.on_click(self.gen_button_cb)
 
         fps_style = {'description_width': '35%'}
@@ -68,24 +53,15 @@ class AnimateTab(object):
         self.size = BoundedIntText(description="w,h(pixels)=", value=500, min=250, max=1500, step=10, disabled=False, tooltip='width, height of video',
           style=size_style, layout=size_layout)
 
-
-        # Generate mpl figure for the video, but make it hidden
-        # plt.ioff()
-        # self.fig = plt.figure(figsize=(9,9))
-        # self.anim_imgs = []
-        # self.mpl_anim = animation.ArtistAnimation(self.fig, self.anim_imgs, interval=100, blit=True, repeat_delay=1000)
         self.video = HTML( value="",
             placeholder='',
             description='',
             layout= Layout(visibility='hidden')
         )
-        # self.video.layout.visibility = 'hidden'
-
 
         if (hublib_flag):
             self.download_mp4_button = Download(self.mp4_zip_file, style='success', icon='cloud-download', 
                                                 tooltip='Download mp4 (you need to allow pop-ups in your browser)')
-                                                # , cb=self.download_video_cb)
             self.download_mp4_button.w.disabled = True
 
             self.tab = VBox([self.instructions, HBox([ self.gen_button, self.fps, self.size, self.feedback,
@@ -185,40 +161,3 @@ class AnimateTab(object):
             self.video.layout.visibility = None
             self.feedback.value = "Done."
         plt.close(self.fig)
-
-    #---------------------------------------------------
-    def update_dropdown_fields(self, data_dir):
-        self.output_dir = data_dir
-        # print('animate_tab:update_dropdown_fields: self.output_dir = ',self.output_dir)
-
-    #---------------------------------------------------
-    def update(self, rdir=''):
-        # print('animate_tab: update called --------')
-        # with debug_view:
-        #     print("substrates: update rdir=", rdir)        
-        # print("substrates: update rdir=", rdir)        
-
-        if rdir:
-            self.output_dir = rdir
-
-        # print('animate_tab: self.output_dir = ',self.output_dir)
-
-        # print('update(): self.output_dir = ', self.output_dir)
-
-        # if self.first_time:
-        #     self.first_time = False
-        #     full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
-        #     if full_xml_filename.is_file():
-        #         tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
-        #         xml_root = tree.getroot()
-        #         self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
-        #         self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
-        #         # print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
-        #         self.modulo = int(self.substrate_delta_t / self.svg_delta_t)
-
-        all_files = sorted(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))   # if .svg
-        if len(all_files) > 0:
-            last_file = all_files[-1]
-            self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "snapshot%08d.svg"
-
-        
