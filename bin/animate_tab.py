@@ -72,6 +72,11 @@ class AnimateTab(object):
     #---------------------------
     # callback for the 'Generate video' button
     def gen_button_cb(self, b):
+
+        if shutil.which('ffmpeg') is None:
+            self.feedback.value = 'Error: the program "ffmpeg" cannot be found in your PATH.'
+            return
+
         self.gen_button.description = 'working'
         self.gen_button.button_style = 'warning' # 'success','info','warning','danger' or ''
         self.gen_button.disabled = True
