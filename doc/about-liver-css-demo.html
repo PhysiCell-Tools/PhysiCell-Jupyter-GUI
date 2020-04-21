@@ -1,0 +1,232 @@
+<h2><strong>GUI Overview</strong></h2>
+<ul>
+<li><b>Config Basics</b> tab:&nbsp;&nbsp;&nbsp; input parameters common to all models (e.g., domain grid, simulation time, choice/frequency of outputs)</li>
+<li><b>Microenvironment</b> tab:&nbsp;&nbsp; microenvironment parameters that are model-specific</li>
+<li><b>User Params</b> tab:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user parameters that are model-specific</li>
+<li><b>Out: Plots</b> tab:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output display of cells and substrates</li>
+<li><b>Animate</b> tab:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; generate an animation of cells</li>
+</ul>
+<p>Edit the domain size and simulation length in the 
+<span style="border: 1px solid black; padding: 0.02in; font-weight: bold;">Config Basics</span> tab. 
+Edit diffusion parameters in the 
+<span style="border: 1px solid black; padding: 0.02in; font-weight: bold;">Microenvironment</span> tab, 
+and model-specific parameters in the 
+<span style="border: 1px solid black; padding: 0.02in; font-weight: bold;">User Params</span> tab. 
+Once you are satisfied with your settings, click the 
+<span style="background-color: green; color: white; padding-left: 0.1in; padding-right: 0.1in"><strong>Run</strong></span>
+ button to start the simulation. (After the run starts, 
+the the Run button is replaced with a <span style="background-color: red; color: white; padding-left: 0.1in; padding-right: 0.1in"><strong>Cancel</strong></span> button.)</p>
+
+<p>As the simulation runs, an "Output" widget can be clicked/expanded to reveal the progress (text) of the simulation. Model outputs can be visualized in the <span style="border: 1px solid black; padding: 0.02in; font-weight: bold;">Out: Plots</span>
+tab while the simulation is running. The "# cell frames" will be dynamically updated as the simulation progresses. Note that the simulation images (SVG files) and raw output data (in MultiCellDS format) can be downloaded in this tab once the simulation is done.</p>
+
+<p>Once the simulation is done running, use the <span style="border: 1px solid black; padding: 0.02in; font-weight: bold;">Animate</span> tab to create a movie. Please be patient: it may take a few minutes for the script to finish running before the movie is embedded in the tab. You can download the generated movie once it's done. </p>
+
+<h2><strong>Introduction</strong></h2>
+
+<p>
+This app demonstrates the evaluation of the effects of mechanical interactions between liver parenchyma (normal liver tissue) and tumor cells on metastatic seeding and growth. 
+</p>
+
+<p><strong>Legend:</strong></b>
+
+<ul>
+
+<li><strong>Liver parenchyma agents:</span></strong> are colored by their relative displacement (normalized by their maximum tolerated displacement). 
+<ul> <!-- style="font-family: courier;"> -->
+<li><span style="height: 25px; width: 25px; background-color: rgb(217,128,64); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> 0 &le; relative displacement &le; 5% max </li>
+</li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(212,145,97); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> 5% &lt; relative displacement &le; 25% max </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(207,162,130); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> 25% &lt; relative displacement &le; 50% max </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(201,179,163); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> 50% &lt; relative displacement &le; 75% max </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(196,196,196); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> 75% &lt; relative displacement &le; 100% max </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(0,0,0); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Apoptotic (due to exceeding maximum displacement) </li>
+</ul>
+</li>
+
+<br/>
+
+<li><strong>Tumor cells:</strong>  are colored by their cell cycle status: 
+<ul> <!-- style="font-family: courier;"> -->
+<li><span style="height: 25px; width: 25px; background-color: rgb(40,200,255); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Ki67- (quiescent) </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(0,255,0); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Ki67+ premitotic (entered cycle and prepraing for division) </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(255,0,255); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Ki67+ postmitotic (finishing cycle after division) </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(255,0,0); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Apoptotic </li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(250,138,38); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Necrotic (due to insufficient oxygen)</li>
+<li><span style="height: 25px; width: 25px; background-color: rgb(255,255,0); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Cycle arrested in Ki67- state due to exceeding maximum pressure</li>
+<!--
+<li><span style="height: 25px; width: 25px; background-color: rgb(0,0,0); display: inline-block; border-radius: 50%; border: 1px solid black;"></span> Black cells are apoptotic or necrotic (dead from stochastic apoptotic, or necrotic due to lack of oxygen): </li>
+-->
+</ul>
+</li>
+
+</ul>
+
+
+<h3>Modeling description</h3>
+
+<p>
+In this model [<a href="#liver_paper">4</a>], We simulate a small tumor growing in <span style="color: #d98040; font-weight: bold">liver parenchyma</span> (maximum size is 1 cm &times; 1 cm). The liver tissue is elastic-plastic: <b>Elastic</b>: on short times, when it’s deformed it elastically tries to return to its rest position and imparts forces on nearby tumor cells; <b>Plastic</b>: on long times, the resting position of these tissue elements relaxes back to the current position. </p> 
+
+<p>We found that:</p>
+
+<p>(1) In high-flow / well-perfused liver tissues, growth substrate limitations (<b>oxygen</b> in our case) alone are an insufficient growth control to prevent non-physical overlap of cells. Mechanobiologic feedbacks are necessary. These are modeled as a pressure that can reduce or completely shut down cycle entry.</p>
+
+<p>(2) In some tissue regimes, this can arrest the growth of micrometastases. <br>
+<strong>Try <em>r</em><sub>E</sub> = 0.2 min<sup>-1</sup>, <em>r</em><sub>P</sub> = 0.0005 min<sup>-1</sup>, and 
+a maximum parenchyma displacement of 3 &mu;m to see this behavior.</strong></p>
+
+<p>(3) In other tissue regimes, tumors will develop invasive fingers into the surrounding tissue 
+along mechanical weaknesses.<br>
+<strong>Try <em>r</em><sub>E</sub> = 0.05 min<sup>-1</sup>, <em>r</em><sub>P</sub> = 0.0005 min<sup>-1</sup>, and 
+a maximum parenchyma displacement of 3 &mu;m to see this behavior.</strong>
+
+
+
+ </P>
+
+
+<h3>Modeling approach</h3>
+
+<p>We used agent-based models to simulation the cell-cell interactions, where the liver parenchyma are stress-based apoptosis and no birth, while tumor cells are pressure-regulated cycling and stochastic apoptosis.</P>
+
+<p>In details, if parenchymal agent’s magnitude of displacement exceeds the maximum tolerated deformation, the parenchyma would enter apoptosis immediately. For the tumor agent, its cycling rate is controlled by the pressure between them and surrounding liver tissue, when the pressue is greater than the threshold value (it is 1 in our default), the birth rate would be set to 0. </p>
+ 
+
+
+<h2><strong>Chemical components:</strong></h2>
+
+<p>All chemical signals move by chemical diffusion in the simulated environment, using BioFVM [<a href="#BioFVM_paper">1</a>] to solve the reaction-diffusion equations. A key property is the <em>diffusion length scale</em>. Diffusion (with a diffusion coefficient <em>D</em>) helps spread a signal over large distances, while decay (and uptake) (with coefficient <em>&lambda;</em>) eliminates the signal to slow its spread. These effects compete to determine the characteristic distance <i>L</i>that a chemical signal travels.</p>
+
+<p>In our model, the only substrate is oxygen. We used 
+BioFVM [<a href="#BioFVM_paper">1</a>] to simulate diffusive transport. 
+By investigating a poroviscoelastic (PVE) model, we constructed a quasi-steady single-lobule model, and extended this for the far-field oxygen solution. See [<a href="#liver_paper">4</a>] for details.</P>
+
+<p>In details, <b>Outside tumors</b>: it's advection-dominated transport. We useed quasi-steady analytic solution for <em>O<sub>2</sub></em> transport; 
+<b>Inside tumors</b>: it's diffusion-dominated transport. We used BioFVM-based numeric solution for <em>O<sub>2</sub></em> transport.</p>
+
+
+
+<h2><b>Cell agents:</b></h2>
+
+<h3>Key features in the agent-based model:</h3>
+<p>The agent-based model was created using PhysiCell [<a href="#PhysiCell_paper">2</a>] as follows:</p> 
+
+<h4>Birth and death:</h4>
+
+<p>Cells can proliferate (divide into two daughter cells of half size), with division rates regulated by cell rules. In our model, cells continuously work to grow towards a &quot;target&quot; mature volume.</p>
+
+<p>Note that birth and death are stochastic events for each cell agent: if such a process occurs at rate <em>r</em>, then between now (<em>t</em>) and soon (<em>t</em> + &Delta;<em>t</em>), the probability of the event occurring for that agent is <em>r</em>&Delta;<em>t</em>.</p>
+
+<p>In our model, liver parenchyma have no birth rate, and their death rate is controlled by the displacement as explained by section of <b>Modeling approach</b>. For the tumor cells, they have normal apoptosis rate, while the cycling rate is regulated by the pressue and oxygen function.</p>
+
+
+<h4>Secretion and uptake:</h4>
+
+<p>
+Cells can secrete chemical factors, or they can remove them (i.e., consume or uptake). This can contribute to gradients in chemical factors, and it&#39;s a key method of communication between cells. Moreover, cells can &quot;sample&quot; the chemical state of their surrounding environment. Secreting is sending a signal. Uptaking and sampling is receiving a signal.</p>
+
+<p>In our model, tumor cells uptake oxygen, which is particularly important in the center area of big tumor. Because, if the tumor radius is greater than <em>diffusion length scale</em> the tumor cells in the center of tumor would have limited oxygen, as a result, their cycling rate would decrease to zero and enter necrosis state. </p> 
+
+<!--
+<h4>Biased migration:</h4>
+
+<p>Motile cells perform <em>biased migration</em>. After traveling for <em>T</em><sub>persistence</sub> time (the mean persistence time), they choose a new migration direction <span style="font-weight: bold;">d</span><sub>migrate</sub>. Based on the environmental conditions, the cell chooses a directional bias (intended direction) <span style="font-weight: bold;">d</span><sub>bias</sub> and a random unit vector <span style="font-weight: bold;">r</span>. The motile direction <span style="font-weight: bold;">d</span><sub>migrate</sub> is then determined by according to:</p>
+
+<p style="text-align: center;"><span style="font-weight: bold;">d</span><sub>migrate</sub> = <em>b</em> <span style="font-weight: bold;">d</span><sub>bias</sub> + (1-<em>b</em>) <span style="font-weight: bold;">r</span>.</p>
+
+<p>Here, <em>b</em> is a <em>bias</em> parameter (between 0 and 1) that determines how strongly biased migration is towards <span style="font-weight: bold;">d</span><sub>bias</sub>. If <em>b</em> =1, then migration is deterministic towards <span style="font-weight: bold;">d</span><sub>bias</sub>. If <em>b</em> = 0, then migration is completely random (Brownian).</p>
+
+<p>Once the migration direction is chosen, it is normalized, and multiplied by the cell&#39;s migration speed.</p>
+
+<p>In out model, we simplified cells as immotile.</p>
+-->
+
+<h4>Mechanics:</h4>
+<p>
+Cell agents can stick to one another within a prescribed interaction distance (some multiple of their radius), and they can exert a pushing force on neighbors. PhysiCell [<a href="#PhysiCell_paper">2</a>] uses potential functions to implement these simple mechanics. Notably, PhysiCell is an off-lattice model, meaning that cells can have variable sizes, and can move freely without grid artifacts.
+</p>
+
+<p>They aren&#39;t required to move some prescribed number of spatial steps. They also can divide without checking for an open neighbor &quot;site&quot;. Instead, they can divide and push their neighbors out of the way. 
+</p>
+
+
+<h4>Cell-cell interactions:</h4>
+<p>
+In the model, two types of cell contacted with each other and produce force/pressue, which regulated their birth rate or death rate. See the details in the following Liver parenchyma cells and Tumor cells. 
+</p>
+
+
+
+<h3>Liver parenchyma cells (<span style="color: #d98040;">Bright orange</span>)</h3>
+
+<p>Each parenchymal agent follows regular adhesion-repulsion mechanics (with a position <em><b>x</b><sub>i</sub></em>). In addition, mechanical interactions are modeled with underlying ECM. Each agent <em>i</em> is attached to the ECM at <em><b>x</b><sub>i,ECM</sub></em>, and experiences an elastic force. Let <b>d</b><sub>i</sub> = <em><b>x</b><sub>i,ECM</sub></em> <em>&#8722;</em> <em><b>x</b><sub>i</sub></em>, and let <em>d<sub>i</sub></em> = &#8741;<b>d</b><sub>i</sub>&#8741; <em>&#8722;</em> <em>R<sub>i</sub></em> (<em>R<sub>i</sub></em> is cell’s equivalent radius) denote the elastic deformation; let <em>r<sub>E</sub></em> and <em>r<sub>P</sub></em> denote the elastic rate and plastic relaxation rate respectively, both the elastic and plastic reorganization show as following:</p>
+
+<p style="text-align: center;"> <img src="doc/img1.PNG" style="width: auto; height: auto;max-width: auto;max-height: 55px"> </p>
+<p style="text-align: center;"> <img src="doc/img2.PNG" style="width: auto; height: auto;max-width: auto;max-height: 55px"> </p>
+
+<p><span style="color: #d98040;">Liver parenchyma cells</span> are originally homeostatic. If parenchymal agent’s magnitude of displacement exceeds the maximum tolerated deformation (<em>d<sub>max</sub></em>), the parenchyma would enter apoptosis immediately. </p>
+
+
+
+<h3>Tumor cells</h3>
+
+<p>The built-in &quot; Ki67_advanced &quot; cell cycle model is used in our model, with the default models of apoptosis and necrosis. Thus, each cell agent can be transited from the Ki67- phase to the pre-mitotic Ki67+ cycle phase, Apoptotic, or Necrotic. For the transition rate, the regular "oxygen-dependent" cycle entry rate is scaled by the pressure. See 
+[<a href="#liver_paper">4</a>] for more details.</p>
+
+<p>Apoptosis is modeled as microenvironment-independent, with a constant apoptotic death rate <em>d<sub>A</sub></em> and a stochastic duration with mean <em>T<sub>A</sub></em>. Necrosis is modeled as oxygen-dependent: cells enter the necrotic state if <em>&sigma;</em> <em>&#60;</em> <em>&sigma;<sub>N</sub></em> (necrosis threshold), and then progress as described in 
+PhysiCell [<a href="#PhysiCell_paper">2</a>]. We also added a rule of pressure-regulated proliferation here, so the cycling rate is: </p>
+
+<p style="text-align: center;"> <img src="doc/img3.PNG" style="width: auto; height: auto;max-width: auto;max-height: 55px"> </p>
+
+<p>The first part is transition rate with oxygen levels as described in [<a href="#PhysiCell_paper">2</a>]. 
+The normalized cell pressure in conﬂuent tissue (no gaps in the tissue) is 0.5 (2D). We deﬁned as <em>p<sub>2</sub></em> and <em>p<sub>1</sub></em> as 1.0 and 0 respectively here, which means if pressure the tumor cell experiences is greater than 1.0, we set the tumor cell proliferation rate as zero, also labeled as <span style="color: #ffff00; background-color: black; padding: 0.02in">yellow</span> in the simulation. 
+</p>
+
+<!--
+<h2><a id="instructions" name="instructions">Basic instructions</a></h2>
+
+<p>Modify parameters in the &quot;Config Basics&quot;, &quot;Microenvironment&quot;, or &quot;User Params&quot; tabs. Click the &quot;Run&quot; button once you are ready.</p>
+
+<p>To view the output results, click the &quot;Out: Plots&quot; tab, and move the slider bar to advance through simulation frames. 
+Note that as the simulation runs, the &quot;# cell frames&quot; field will increase, so you can view more simulation frames.</p>
+
+<p>If there are multiple substrates defined in the Microenvironment, you can select a different one from the drop-down widget in the Plots tab. You can also fix the colormap range of values.</p>
+
+<p>Note that you can download full simulation data for further exploration in your tools of choice. And you can also generate an animation of the cells to play in the browser and, optionally, download as a video.</p>
+-->
+
+<h3><strong>About the software: </strong></h3> 
+<p>
+This model [<a href="#liver_paper">4</a>] and cloud-hosted demo are part of the education and outreach 
+    for the IU Engineered nanoBIO Node. 
+    The models are built using PhysiCell: a C++ framework for multicellular systems biology 
+[<a href="#PhysiCell_paper">2</a>] for the core simulation engine and xml2jupyter 
+[<a href="#xml2jupyter_paper">3</a>] to create the graphical user interface (GUI).</p>
+<ol>
+
+<!-- 1 --> 
+<li id="BioFVM_paper">
+
+A. Ghaffarizadeh, S.H. Friedman, and P. Macklin. BioFVM: an efficient, parallelized diffusive transport solver for 3-D biological simulations. Bioinformatics 32(8):1256-8, 2016. <a href="http://dx.doi.org/10.1093/bioinformatics/btv730">DOI: 10.1093/bioinformatics/btv730.</a>
+</li>
+
+<!-- 2 --> 
+<li id="PhysiCell_paper">
+A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin. PhysiCell: an open source physics-based cell simulator for 3-D multicellular systems. PLoS Comput. Biol. 14(2):e1005991, 2018. <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005991">DOI: 10.1371/journal.pcbi.1005991.</a> </li>
+
+<!-- 3 --> 
+<li id="xml2jupyter_paper">
+R. Heiland, D. Mishler, T. Zhang, E. Bower, and P. Macklin. xml2jupyter: Mapping parameters between XML and Jupyter widgets. Journal of Open Source Software 4(39):1408, 2019. <a href="https://joss.theoj.org/papers/10.21105/joss.01408">DOI: 10.21105/joss.01408.</a>
+</li>
+
+<!-- 4 -->
+<li id="liver_paper">
+Y. Wang, E. Brodin, K. Nishii, H.B. Frieboes, 
+S. Mumenthaler, J.L. Sparks, and P. Macklin. 
+Impact of tumor-parenchyma biomechanics on liver 
+metastatic seeding: a multi-model approach. 
+2020 (in submission). <!-- <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005991">DOI: ? </a> -->
+</li>
+
+</ol>
