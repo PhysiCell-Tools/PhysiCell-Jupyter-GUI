@@ -118,6 +118,7 @@ class UserTab(object):
         widget_layout = {'width': '15%'}
         units_button_layout ={'width':'15%'}
         desc_button_layout={'width':'45%'}
+        divider_button_layout={'width':'40%'}
 """
 
 """
@@ -191,20 +192,24 @@ root = tree.getroot()
 
 indent = "        "
 indent2 = "          "
-widgets = {"double":"FloatText", "int":"IntText", "bool":"Checkbox", "string":"Text"}
-type_cast = {"double":"float", "int":"int", "bool":"bool", "string":""}
+widgets = {"double":"FloatText", "int":"IntText", "bool":"Checkbox", "string":"Text", "divider":""}
+#widgets = {"double":"FloatText", "int":"IntText", "bool":"Checkbox", "string":"Text"}
+type_cast = {"double":"float", "int":"int", "bool":"bool", "string":"", "divider":"Text"}
 vbox_str = "\n" + indent + "self.tab = VBox([\n"
 #param_desc_buttons_str = "\n" 
 #name_buttons_str = "\n" 
 units_buttons_str = "\n" 
-desc_buttons_str = "\n" 
+desc_buttons_str = "\n"
+header_buttons_str = "\n"
 row_str = "\n"
 box_str = "\n" + indent + "box_layout = Layout(display='flex', flex_flow='row', align_items='stretch', width='100%')\n"
-
+row_header_str = "\n"
+box_header_str = "\n"
 #        box1 = Box(children=row1, layout=box_layout)\n"
 
 menv_var_count = 0   # micronenv 
 param_count = 0
+divider_count = 0
 color_count = 0
 #param_desc_count = 0
 name_count = 0
@@ -227,11 +232,30 @@ print_var_types = False
 
 tag_list = []
 
+# function to process a "divider" type element
+def handle_divider(child):
+    global divider_count, user_tab_header, indent, indent2, vbox_str
+    divider_count += 1
+    print('-----------> handler_divider: ',divider_count)
+    row_name = "div_row" + str(divider_count)
+    user_tab_header += "\n" + indent + row_name + " = " + "Button(description='" + child.attrib['description'] + "', disabled=True, layout=divider_button_layout)\n"
+    vbox_str += indent2 + row_name + ",\n"
+
+
+#===========  main loop ===================
 # NOTE: we assume a simple "children-only" hierarchy in <user_parameters>
-for child in uep:
+for child in uep:   # uep = "unique entry point" for <user_parameters> (from above)
     if print_vars:
         print(child.tag, child.attrib)
-    if child.tag in tag_list:
+
+    divider_flag = False
+    if child.attrib['type'].lower() == 'divider':
+        divider_flag = True
+    else:
+        param_count += 1
+
+    # we allow the divider elements to have the same name, but not other elements
+    if (child.tag in tag_list) and (not divider_flag):
         print("-------> Warning: duplicate tag!  ", child.tag)
         continue
     else:
@@ -244,21 +268,25 @@ for child in uep:
 
 #    names_str = ''
 #    units_str = ''
-    describe_str = ''
+    # describe_str = ''
 #    desc_row_name = None
     desc_row_name = ''
     units_btn_name = ''
-    param_count += 1
-    if 'description' in child.attrib.keys():
-        describe_str = child.attrib['description']
-    else:
-        describe_str = ""
-    desc_row_name = "desc_button" + str(param_count)
-    desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
-    if (param_count % 2):
-        desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname1 + "'\n"
-    else:  # rf.  https://www.w3schools.com/colors/colors_names.asp
-        desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname2 + "'\n"
+
+
+    if not divider_flag:
+        if 'description' in child.attrib.keys():
+            describe_str = child.attrib['description']
+        else:
+            describe_str = ""
+        desc_row_name = "desc_button" + str(param_count)
+        desc_buttons_str += indent + desc_row_name + " = " + "Button(description='" + describe_str + "' , tooltip='" + describe_str + "', disabled=True, layout=desc_button_layout) \n"
+        # print("--- debug: " + desc_row_name + " --> " + describe_str)   #rwh debug
+
+        if (param_count % 2):
+            desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname1 + "'\n"
+        else:  # rf.  https://www.w3schools.com/colors/colors_names.asp
+            desc_buttons_str += indent + desc_row_name + ".style.button_color = '" + colorname2 + "'\n"
 
     if 'units' in child.attrib.keys():
         if child.attrib['units'] != "dimensionless" and child.attrib['units'] != "none":
@@ -291,11 +319,17 @@ for child in uep:
 #             self.therapy_activation_time = BoundedFloatText(
 #            min=0., max=100000000, step=stepsize,
         full_name = "self." + child.tag
-        name_count += 1
+        # name_count += 1
         if child.attrib['type'] not in widgets.keys():
             print("    *** Error - Invalid type: " + child.attrib['type'])
             sys.exit(1)
         else:    
+            # The "divider" type elements are unique; let's handle them in their own function
+            if divider_flag:
+                handle_divider(child)
+                continue
+
+            name_count += 1
             param_name_button = "param_name" + str(name_count)
             user_tab_header += "\n" + indent + param_name_button + " = " + "Button(description='" + child.tag + "', disabled=True, layout=name_button_layout)\n"
             if (param_count % 2):
@@ -351,23 +385,36 @@ for child in uep:
             elif child.attrib['type'] == "string":
                 user_tab_header += indent2 + "value='" + child.text + "',\n"
 
+            # elif child.attrib['type'].lower() == 'divider':
+            #     divider_flag = True
+            #     child.text = "Worker_Parameters"
+            #     # user_tab_header += indent2 + "value=" + child.description + ",\n"
+            #     user_tab_header += indent2 + "value=" + child.attrib['description'] + ",\n"
 
-            # Finally, append the info at the end of this widget
-            user_tab_header += indent2 + "style=style, layout=widget_layout)\n"
 
             row_name = "row" + str(param_count)
-            row_str += indent +  row_name + " = [" + param_name_button + ", " + full_name + ", " + units_btn_name + ", " + desc_row_name + "] \n"
             box_name = "box" + str(param_count)
-            box_str += indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n"
+            if (not divider_flag):
+                # We're processing a "normal" row - typically a name, numeric field, units, description
+                #  - append the info at the end of this widget
+                user_tab_header += indent2 + "style=style, layout=widget_layout)\n"
+
+                row_str += indent +  row_name + " = [" + param_name_button + ", " + full_name + ", " +      units_btn_name + ", " + desc_row_name + "] \n"
+
+                box_str += indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n"
+            else:  # divider
+                box_str += indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n"
+
             vbox_str += indent2 + box_name + ",\n"
 
-            # float, int, bool
-            if (type_cast[child.attrib['type']] == "bool"):
-                fill_gui_str += indent + full_name + ".value = ('true' == (uep.find('.//" + child.tag + "').text.lower()) )\n"
-            else:
-                fill_gui_str += indent + full_name + ".value = " + type_cast[child.attrib['type']] + "(uep.find('.//" + child.tag + "').text)\n"
+            if (not divider_flag):
+                # float, int, bool
+                if (type_cast[child.attrib['type']] == "bool"):
+                    fill_gui_str += indent + full_name + ".value = ('true' == (uep.find('.//" + child.tag + "').text.lower()) )\n"
+                else:
+                    fill_gui_str += indent + full_name + ".value = " + type_cast[child.attrib['type']] + "(uep.find('.//" + child.tag + "').text)\n"
 
-            fill_xml_str += indent + "uep.find('.//" + child.tag + "').text = str("+ full_name + ".value)\n"
+                fill_xml_str += indent + "uep.find('.//" + child.tag + "').text = str("+ full_name + ".value)\n"
 
 vbox_str += indent + "])"
 
@@ -478,8 +525,8 @@ root = tree.getroot()
 
 indent = "        "
 indent2 = "          "
-widgets = {"double":"FloatText", "int":"IntText", "bool":"Checkbox", "string":"Text"}
-type_cast = {"double":"float", "int":"int", "bool":"bool", "string":""}
+widgets = {"double":"FloatText", "int":"IntText", "bool":"Checkbox", "string":"Text", "divider":"div"}
+type_cast = {"double":"float", "int":"int", "bool":"bool", "string":"", "divider":"div"}
 vbox_str = "\n" + indent + "self.tab = VBox([\n"
 #param_desc_buttons_str = "\n" 
 #name_buttons_str = "\n" 
@@ -492,6 +539,7 @@ box_str = "\n" + indent + "box_layout = Layout(display='flex', flex_flow='row', 
 
 menv_var_count = 0   # micronenv 
 param_count = 0
+divider_count = 0
 color_count = 0
 #param_desc_count = 0
 name_count = 0
@@ -545,6 +593,7 @@ if uep:
         #  1) Variable name + [units]
         menv_var_name_button = "menv_var" + str(menv_var_count)
         menv_var_name = var.attrib['name'].replace(" ","_")   # e.g., "director signal" --> "director_signal"
+        menv_var_name = menv_var_name.replace("-","_")   # e.g., "pro-inflammatory_cytokine" --> "pro_inflammatory_cytokine"
         print('menv_var_name=',menv_var_name)
         units_str = ''
         if ('units' in var.attrib) and (var.attrib['units'] != 'dimensionless'):
