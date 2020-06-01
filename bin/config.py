@@ -149,13 +149,15 @@ class ConfigTab(object):
         #     description='$T_0$',
         #     layout=Layout(width=constWidth),
         # )
-        self.svg_interval = BoundedIntText(
+        # self.svg_interval = BoundedIntText(
+        self.svg_interval = BoundedFloatText(
             min=1,
             max=99999999,   # TODO: set max on all Bounded to avoid unwanted default
             description='every',
             layout=Layout(width='160px'),
         )
-        self.mcds_interval = BoundedIntText(
+        # self.mcds_interval = BoundedIntText(
+        self.mcds_interval = BoundedFloatText(
             min=1,
             max=99999999,
             description='every',
@@ -256,14 +258,16 @@ class ConfigTab(object):
             self.toggle_mcds.value = True
         else:
             self.toggle_mcds.value = False
-        self.mcds_interval.value = int(xml_root.find(".//full_data//interval").text)
+        # self.mcds_interval.value = int(xml_root.find(".//full_data//interval").text)
+        self.mcds_interval.value = float(xml_root.find(".//full_data//interval").text)
 
         # NOTE: do this *after* filling the mcds_interval, directly above, due to the callback/constraints on them
         if xml_root.find(".//SVG//enable").text.lower() == 'true':
             self.toggle_svg.value = True
         else:
             self.toggle_svg.value = False
-        self.svg_interval.value = int(xml_root.find(".//SVG//interval").text)
+        # self.svg_interval.value = int(xml_root.find(".//SVG//interval").text)
+        self.svg_interval.value = float(xml_root.find(".//SVG//interval").text)
 
 
     # Read values from the GUI widgets and generate/write a new XML
