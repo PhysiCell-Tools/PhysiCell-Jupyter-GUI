@@ -18,6 +18,7 @@ import sys
 import shutil
 import os
 import platform
+import xml.etree.ElementTree as ET
 
 
 num_args = len(sys.argv)
@@ -215,9 +216,11 @@ In /data:
 python xml2jupyter.py PhysiCell_settings.xml
 Copy the generated user_params.py to ../bin
 """
+print('--------------------------------------------------------')
 print('Trying to run xml2jupyter.py on your .xml file in /data')
 os.chdir("data")
 cmd = "python xml2jupyter.py PhysiCell_settings.xml"
+print(cmd)
 try:
     os.system("python xml2jupyter.py PhysiCell_settings.xml")
 except:
@@ -226,16 +229,51 @@ except:
 
 new_file = os.path.join("..","bin")
 try:
+    print("-------------------------------------")
+    print("cp user_params.py " + new_file)
     shutil.copy("user_params.py", new_file)
 except:
     print("  ---> Cannot copy data/user_params.py to bin/user_params.py")
     print("         You will need to do that manually.\n")
+
+
 try:
+    print("-------------------------------------")
+    print("cp microenv_params.py " + new_file)
     shutil.copy("microenv_params.py", new_file)
 except:
     print("  ---> Cannot copy data/microenv_params.py to bin/microenv_params.py")
     print("         You will need to do that manually.\n")
 
+
+print('---------------------------')
+config_file = "PhysiCell_settings.xml"
+tree = ET.parse(config_file)
+root = tree.getroot()
+if root.find('.//cell_definitions'):
+    #os.chdir("..")
+    print('Trying to run create_cell_def.py on your .xml file in /data')
+    #os.chdir("data")
+    cmd = "python create_cell_types.py PhysiCell_settings.xml"
+    print(cmd)
+    try:
+        os.system("python create_cell_types.py PhysiCell_settings.xml")
+    except:
+        print("  ---> Cannot execute: ",cmd)
+
+    new_file = os.path.join("..","bin")
+    try:
+        print("Trying: cp cell_types.py " + new_file)
+        shutil.copy("cell_types.py", new_file)
+    except:
+        print("  ---> Cannot copy data/cell_types.py to bin/cell_types.py")
+        print("         You will need to do that manually.\n")
+else:
+    print(".xml does not contain <cell_definitions>, so will not create that tab")
+    print('---------------------------\n')
+
+
+#----------------------------------
 if platform.system() != 'Windows':
     try:
         print("Trying to import hublib.ui")
@@ -244,6 +282,7 @@ if platform.system() != 'Windows':
         print("hublib.ui is not found, will try to install it.")
         os.system("pip install -U hublib")
 
+print("\n====================   doing sys.exit(1) =======================")
 sys.exit(1)
 
 
