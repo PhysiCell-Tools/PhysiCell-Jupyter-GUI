@@ -24,6 +24,7 @@ class UserTab(object):
         widget_layout = {'width': '15%'}
         units_button_layout ={'width':'15%'}
         desc_button_layout={'width':'45%'}
+        divider_button_layout={'width':'40%'}
 
         param_name1 = Button(description='random_seed', disabled=True, layout=name_button_layout)
         param_name1.style.button_color = 'lightgreen'
@@ -32,6 +33,8 @@ class UserTab(object):
           value=0,
           step=1,
           style=style, layout=widget_layout)
+
+        div_row1 = Button(description='---Worker Parameters---', disabled=True, layout=divider_button_layout)
 
         param_name2 = Button(description='elastic_coefficient', disabled=True, layout=name_button_layout)
         param_name2.style.button_color = 'tan'
@@ -73,6 +76,8 @@ class UserTab(object):
           step=0.1,
           style=style, layout=widget_layout)
 
+        div_row2 = Button(description='---Misc---', disabled=True, layout=divider_button_layout)
+
         param_name7 = Button(description='number_of_directors', disabled=True, layout=name_button_layout)
         param_name7.style.button_color = 'lightgreen'
 
@@ -105,6 +110,8 @@ class UserTab(object):
           step=0.1,
           style=style, layout=widget_layout)
 
+        div_row3 = Button(description='---Colors---', disabled=True, layout=divider_button_layout)
+
         param_name11 = Button(description='worker_color', disabled=True, layout=name_button_layout)
         param_name11.style.button_color = 'lightgreen'
 
@@ -128,18 +135,18 @@ class UserTab(object):
 
         units_button1 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button1.style.button_color = 'lightgreen'
-        units_button2 = Button(description='1/min', disabled=True, layout=units_button_layout) 
-        units_button2.style.button_color = 'tan'
-        units_button3 = Button(description='min', disabled=True, layout=units_button_layout) 
-        units_button3.style.button_color = 'lightgreen'
-        units_button4 = Button(description='micron/min', disabled=True, layout=units_button_layout) 
-        units_button4.style.button_color = 'tan'
-        units_button5 = Button(description='', disabled=True, layout=units_button_layout) 
-        units_button5.style.button_color = 'lightgreen'
+        units_button2 = Button(description='', disabled=True, layout=units_button_layout) 
+        units_button2.style.button_color = 'lightgreen'
+        units_button3 = Button(description='1/min', disabled=True, layout=units_button_layout) 
+        units_button3.style.button_color = 'tan'
+        units_button4 = Button(description='min', disabled=True, layout=units_button_layout) 
+        units_button4.style.button_color = 'lightgreen'
+        units_button5 = Button(description='micron/min', disabled=True, layout=units_button_layout) 
+        units_button5.style.button_color = 'tan'
         units_button6 = Button(description='', disabled=True, layout=units_button_layout) 
-        units_button6.style.button_color = 'tan'
+        units_button6.style.button_color = 'lightgreen'
         units_button7 = Button(description='', disabled=True, layout=units_button_layout) 
-        units_button7.style.button_color = 'lightgreen'
+        units_button7.style.button_color = 'tan'
         units_button8 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button8.style.button_color = 'tan'
         units_button9 = Button(description='', disabled=True, layout=units_button_layout) 
@@ -151,7 +158,13 @@ class UserTab(object):
         units_button12 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button12.style.button_color = 'tan'
         units_button13 = Button(description='', disabled=True, layout=units_button_layout) 
-        units_button13.style.button_color = 'lightgreen'
+        units_button13.style.button_color = 'tan'
+        units_button14 = Button(description='', disabled=True, layout=units_button_layout) 
+        units_button14.style.button_color = 'lightgreen'
+        units_button15 = Button(description='', disabled=True, layout=units_button_layout) 
+        units_button15.style.button_color = 'tan'
+        units_button16 = Button(description='', disabled=True, layout=units_button_layout) 
+        units_button16.style.button_color = 'lightgreen'
 
         desc_button1 = Button(description='', disabled=True, layout=desc_button_layout) 
         desc_button1.style.button_color = 'lightgreen'
@@ -159,7 +172,7 @@ class UserTab(object):
         desc_button2.style.button_color = 'tan'
         desc_button3 = Button(description='time between direction changes for workers', disabled=True, layout=desc_button_layout) 
         desc_button3.style.button_color = 'lightgreen'
-        desc_button4 = Button(description='worker migration speed', disabled=True, layout=desc_button_layout) 
+        desc_button4 = Button(description='', disabled=True, layout=desc_button_layout) 
         desc_button4.style.button_color = 'tan'
         desc_button5 = Button(description='how strictly attached workers follow chemotactic signals', disabled=True, layout=desc_button_layout) 
         desc_button5.style.button_color = 'lightgreen'
@@ -181,18 +194,18 @@ class UserTab(object):
         desc_button13.style.button_color = 'lightgreen'
 
         row1 = [param_name1, self.random_seed, units_button1, desc_button1] 
-        row2 = [param_name2, self.elastic_coefficient, units_button2, desc_button2] 
-        row3 = [param_name3, self.worker_motility_persistence_time, units_button3, desc_button3] 
-        row4 = [param_name4, self.worker_migration_speed, units_button4, desc_button4] 
-        row5 = [param_name5, self.attached_worker_migration_bias, units_button5, desc_button5] 
-        row6 = [param_name6, self.unattached_worker_migration_bias, units_button6, desc_button6] 
-        row7 = [param_name7, self.number_of_directors, units_button7, desc_button7] 
-        row8 = [param_name8, self.number_of_cargo_clusters, units_button8, desc_button8] 
-        row9 = [param_name9, self.number_of_workers, units_button9, desc_button9] 
-        row10 = [param_name10, self.drop_threshold, units_button10, desc_button10] 
-        row11 = [param_name11, self.worker_color, units_button11, desc_button11] 
-        row12 = [param_name12, self.cargo_color, units_button12, desc_button12] 
-        row13 = [param_name13, self.director_color, units_button13, desc_button13] 
+        row2 = [param_name2, self.elastic_coefficient, units_button3, desc_button2] 
+        row3 = [param_name3, self.worker_motility_persistence_time, units_button4, desc_button3] 
+        row4 = [param_name4, self.worker_migration_speed, units_button5, desc_button4] 
+        row5 = [param_name5, self.attached_worker_migration_bias, units_button6, desc_button5] 
+        row6 = [param_name6, self.unattached_worker_migration_bias, units_button7, desc_button6] 
+        row7 = [param_name7, self.number_of_directors, units_button9, desc_button7] 
+        row8 = [param_name8, self.number_of_cargo_clusters, units_button10, desc_button8] 
+        row9 = [param_name9, self.number_of_workers, units_button11, desc_button9] 
+        row10 = [param_name10, self.drop_threshold, units_button12, desc_button10] 
+        row11 = [param_name11, self.worker_color, units_button14, desc_button11] 
+        row12 = [param_name12, self.cargo_color, units_button15, desc_button12] 
+        row13 = [param_name13, self.director_color, units_button16, desc_button13] 
 
         box_layout = Layout(display='flex', flex_flow='row', align_items='stretch', width='100%')
         box1 = Box(children=row1, layout=box_layout)
@@ -211,15 +224,18 @@ class UserTab(object):
 
         self.tab = VBox([
           box1,
+          div_row1,
           box2,
           box3,
           box4,
           box5,
           box6,
+          div_row2,
           box7,
           box8,
           box9,
           box10,
+          div_row3,
           box11,
           box12,
           box13,
