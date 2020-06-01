@@ -150,15 +150,8 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 
-		<!-- for microenvironment setup --> 
-<!--		
-		<cargo_signal_D type="double" units="micron/min^2">1e3</cargo_signal_D>
-		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> 
-		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
-		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> 
--->		
-		
-		<!-- for cell definitions -->
+		<!-- worker params --> 
+		<div type="divider" description="---Worker Parameters---"/>
 		<elastic_coefficient type="double" units="1/min" description="strength of worker-cargo adhesion">0.15</elastic_coefficient>
 
 		<worker_motility_persistence_time type="double" units="min" description="time between direction changes for workers">5.0</worker_motility_persistence_time>
@@ -168,7 +161,8 @@
 		<unattached_worker_migration_bias type="double" units="dimensionless"
 			description="how strictly unattached workers follow chemotactic signals">0.5</unattached_worker_migration_bias>
 
-		<!-- tissue setup --> 
+		<!-- misc --> 
+		<div type="divider" description="---Misc---"/>
 		<number_of_directors type="int" units="none" description="number of director cells">15</number_of_directors> 
 		<number_of_cargo_clusters type="int" units="none" description="number of 7-cell cargo clusters">100</number_of_cargo_clusters>
 		<number_of_workers type="int" units="none" description="number of worker cells">50</number_of_workers>
@@ -177,6 +171,7 @@
 		<drop_threshold type="double" units="dimensionless" description="drop cargo when director signal exceeds this level">0.4</drop_threshold> 
 		
 		<!-- colors --> 
+		<div type="divider" description="---Colors---"/>
 		<worker_color type="string" units="none" description="color for worker cells (see W3C colors)">red</worker_color>
 		<cargo_color type="string" units="none" description="color for cargo cells">blue</cargo_color>
 		<director_color type="string" units="none" description="color for director cells">limegreen</director_color> 
