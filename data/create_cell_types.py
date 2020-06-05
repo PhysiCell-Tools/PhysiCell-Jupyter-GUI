@@ -281,6 +281,12 @@ def get_float_stepsize(val_str):
         delta_val = 0.01  # if initial value=0.0, we're totally guessing at what a good delta is
     return delta_val
 
+def create_checkbox_widget(name, desc, val):
+    global cells_tab_header, indent
+    toggle_str = indent + name + " = Checkbox(description='" + desc + "', value=" + val + ",layout=name_button_layout)\n"
+    cells_tab_header += toggle_str
+    # return widget_str
+
 def create_float_text_widget(name, initial_val, delta_val):
     global cells_tab_header, indent, indent2
     if delta_val > 0:
@@ -429,51 +435,110 @@ for cell_def in uep.findall('cell_definition'):
     for child in uep_phenotype:
         print('pheno child=',child)
         if child.tag == 'cycle':  # <cycle code="6" name="flow_cytometry_separated_cycle_model">
-            fill_gui_and_xml_comment("# ---------  cycle (" + child.attrib['name'] + ")")  
+            cycle_name = ""
+            if 'name' in child.attrib.keys():   
+                cycle_name = child.attrib['name']
+
+            cycle_code = ""
+            if 'code' in child.attrib.keys():   
+                cycle_code = child.attrib['code']
+
+            fill_gui_and_xml_comment("# ---------  cycle (" + cycle_name + ")")  
 
             subpath1 = subpath0  + "//" + child.tag
 
             # print('cycle code=',child.attrib['code'])
             # print('cycle name=',child.attrib['name'])
 
-            divider_pheno_name = handle_divider_pheno(prefix + child.tag + " (model: " + child.attrib['name'] + "; code=" + child.attrib['code'] + ")" ) 
+            divider_pheno_name = handle_divider_pheno(prefix + child.tag + " (model: " + cycle_name + "; code=" + cycle_code + ")" ) 
             elm_str += divider_pheno_name + ", "
             # print(elm_str)
             color_str = indent + divider_pheno_name + ".style.button_color = '" + colorname[color_idx] + "'\n"
 
-            subpath2 = subpath1 + "//transition_rates"
-            # print("\n---------------- subpath2 = ", subpath2)
-            for rates in child:
-                units_str = rates.attrib['units']
-                rate_count = 0
-                for rate in rates:
-                    # btn_name = "transition rate: " + rate.attrib['start_index'] + "->" + rate.attrib['end_index']
-                    btn_name = "Phase " + rate.attrib['start_index'] + " -> Phase " + rate.attrib['end_index'] + " transition rate"
-                    create_disabled_button_name(btn_name)  # creates "button_widget_name"
+            # <phase_durations units="min"> 
+            #     <duration index="0" fixed_duration="false">300.0</duration>
+            for cycle_child in child:
+                if cycle_child.tag == 'phase_durations':
+                    subpath2 = subpath1 +  "//phase_durations"
+                    units_str = ""
+                    if 'units' in cycle_child.attrib.keys():
+                        units_str = cycle_child.attrib['units']
+                    duration_count = 0
+                    for duration_elm in cycle_child:
+                        w0 = "self.bool" + str(bool_var_count)
+                        bool_var_count += 1
 
-                    w2 = "self.float" + str(float_var_count)
-                    float_var_count += 1
-                    cells_tab_header += create_float_text_widget(w2, rate.text, -1)
+                        duration_count += 1
+                        subpath3 = subpath2 +  "//duration[" + str(duration_count) + "]"
 
-                    rate_count += 1
+                        if duration_elm.attrib['fixed_duration'].lower() == 'true':
+                            val = "True"
+                        else:
+                            val = "False"
+                        attrib_name = 'fixed_duration'
+                        toggle_str = indent + w0 + " = Checkbox(description='" + attrib_name + "', value=" + val + ",layout=name_button_layout)\n"
+                        cells_tab_header += toggle_str
+                        # create_checkbox_widget(w0, attrib_name, val)
 
-                    subpath = subpath2 +  "//rate[" + str(rate_count) + "]"
+                        fill_gui_and_xml_bool_attrib(w0, subpath3, attrib_name)
 
-                    fill_gui_and_xml(w2, subpath)
+                        btn_name = "duration"
+                        create_disabled_button_name(btn_name)  # creates "button_widget_name"
 
-                    create_disabled_button_units(units_str)  # creates "button_widget_units"
-                    color_idx = 1 - color_idx
+                        w2 = "self.float" + str(float_var_count)
+                        float_var_count += 1
+                        cells_tab_header += create_float_text_widget(w2, duration_elm.text, -1)
 
-                    # row_name = "row" 
-                    # row_str = indent + row_name + " = [" + button_widget_name + ", " + w2 +  ", " + button_widget_units + "]\n"
-                    # cells_tab_header += row_str
-                    create_row_of_widgets([button_widget_name, w2, button_widget_units])
+                        fill_gui_and_xml(w2,subpath3)
 
-                    box_name = "box" + str(box_count) 
-                    box_count += 1
-                    box_str = indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n\n"
-                    cells_tab_header += box_str 
-                    elm_str += box_name + ", "
+                        create_disabled_button_units(units_str)  # creates "button_widget_units"
+                        color_idx = 1 - color_idx
+
+                        create_row_of_widgets([w0, button_widget_name, w2, button_widget_units])
+
+                        box_name = "box" + str(box_count) 
+                        box_count += 1
+                        box_str = indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n\n"
+                        cells_tab_header += box_str 
+                        elm_str += box_name + ", "
+
+
+                elif cycle_child.tag == 'phase_transition_rates':
+                    subpath2 = subpath1 + "//" + cycle_child.tag
+                    # print("\n---------------- subpath2 = ", subpath2)
+                    for rates in child:
+                        units_str = ""
+                        if 'units' in rates.attrib.keys():
+                            units_str = rates.attrib['units']
+                        rate_count = 0
+                        for rate in rates:
+                            # btn_name = "transition rate: " + rate.attrib['start_index'] + "->" + rate.attrib['end_index']
+                            btn_name = "Phase " + rate.attrib['start_index'] + " -> Phase " + rate.attrib['end_index'] + " transition rate"
+                            create_disabled_button_name(btn_name)  # creates "button_widget_name"
+
+                            w2 = "self.float" + str(float_var_count)
+                            float_var_count += 1
+                            cells_tab_header += create_float_text_widget(w2, rate.text, -1)
+
+                            rate_count += 1
+
+                            subpath = subpath2 +  "//rate[" + str(rate_count) + "]"
+
+                            fill_gui_and_xml(w2, subpath)
+
+                            create_disabled_button_units(units_str)  # creates "button_widget_units"
+                            color_idx = 1 - color_idx
+
+                            # row_name = "row" 
+                            # row_str = indent + row_name + " = [" + button_widget_name + ", " + w2 +  ", " + button_widget_units + "]\n"
+                            # cells_tab_header += row_str
+                            create_row_of_widgets([button_widget_name, w2, button_widget_units])
+
+                            box_name = "box" + str(box_count) 
+                            box_count += 1
+                            box_str = indent + box_name + " = Box(children=" + row_name + ", layout=box_layout)\n\n"
+                            cells_tab_header += box_str 
+                            elm_str += box_name + ", "
 
 
         elif child.tag == 'death':
@@ -496,8 +561,8 @@ for cell_def in uep.findall('cell_definition'):
                 # print('death name=',death_model.attrib['name'])
 
                 #----------  overall death model rate -------------
-                rate = death_model.find('.//rate')  
-                subpath3 = subpath2 +  "//rate"
+                rate = death_model.find('.//death_rate')  
+                subpath3 = subpath2 +  "//death_rate"
 
                 create_disabled_button_name("death rate")  # creates "button_widget_name"
 
@@ -862,6 +927,7 @@ for cell_def in uep.findall('cell_definition'):
                 if elm.tag == 'substrate':
                     substrate_count += 1
                     subpath2 = subpath1  + "//" + elm.tag + "[" + str(substrate_count) + "]"
+                    print(subpath2)
 
                     create_disabled_button_name("substrate")  # creates "button_widget_name"
 
@@ -880,7 +946,7 @@ for cell_def in uep.findall('cell_definition'):
                     box_str = indent + box_name + " = Box(children=row, layout=box_layout)\n"
                     cells_tab_header += box_str
                     elm_str += box_name + ","
-                    substrate_count += 1
+                    # substrate_count += 1
 
                     for sub_elm in elm:
                         subpath3 = subpath2  + "//" + sub_elm.tag
