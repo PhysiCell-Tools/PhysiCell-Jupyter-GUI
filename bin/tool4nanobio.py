@@ -136,6 +136,8 @@ def write_config_file(name):
     config_tab.fill_xml(xml_root)
     microenv_tab.fill_xml(xml_root)
     user_tab.fill_xml(xml_root)
+    if xml_root.find('.//cell_definitions'):
+        cell_types_tab.fill_xml(xml_root)
     tree.write(name)
 
     # update substrate mesh layout (beware of https://docs.python.org/3/library/functions.html#round)
@@ -217,6 +219,8 @@ def fill_gui_params(config_file):
     config_tab.fill_gui(xml_root)
     microenv_tab.fill_gui(xml_root)
     user_tab.fill_gui(xml_root)
+    if xml_root.find('.//cell_definitions'):
+        cell_types_tab.fill_gui(xml_root)
 
 
 def run_done_func(s, rdir):
