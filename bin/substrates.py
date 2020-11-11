@@ -77,6 +77,12 @@ class SubstrateTab(object):
         self.show_nucleus = False
         self.show_edge = True
 
+        # Paul's additions in Nov 2020
+        self.bgcolor = [1,1,1]
+        self.dark_mode = True; 
+        self.enable_alpha = True; 
+        self.default_alpha = 0.4
+
         # initial value
         self.field_index = 4
         # self.field_index = self.mcds_field.value + 4
@@ -147,8 +153,9 @@ class SubstrateTab(object):
         self.field_cmap.observe(self.mcds_field_cb)
 
         self.cmap_fixed_toggle = Checkbox(
-            description='Fix',
+            description='Fixed substrate range?',
             disabled=False,
+            value=True,
 #           layout=Layout(width=constWidth2),
         )
         self.cmap_fixed_toggle.observe(self.mcds_field_cb)
@@ -283,6 +290,23 @@ class SubstrateTab(object):
 
         self.cell_edges_toggle.observe(cell_edges_toggle_cb)
 
+        self.cell_alpha_toggle = Checkbox(
+            description='transparency',
+            disabled=False,
+            value=self.enable_alpha, 
+        )
+        def cell_alpha_toggle_cb(b):
+            #print( 'yay ')
+            if( self.cell_alpha_toggle.value):
+                self.enable_alpha = True
+                #print( 'enable') 
+            else:
+                self.enable_alpha = False 
+                #print( 'disable')
+            self.i_plot.update()
+
+        self.cell_alpha_toggle.observe(cell_alpha_toggle_cb)
+
         self.cells_toggle = Checkbox(
             description='Cells',
             disabled=False,
@@ -300,6 +324,28 @@ class SubstrateTab(object):
                 self.cell_nucleus_toggle.disabled = True
 
         self.cells_toggle.observe(cells_toggle_cb)
+
+
+        self.dark_mode_toggle = Checkbox(
+            description='dark mode',
+            disabled=False,
+            value=self.dark_mode, 
+        )
+        def dark_mode_toggle_cb(b):
+            #print( 'yay ')
+            if( self.dark_mode_toggle.value):
+                self.dark_mode = True
+                self.bgcolor = [0,0,0,1]
+                #print( 'enable') 
+            else:
+                self.dark_mode = False 
+                self.bgcolor = [1,1,1,1]
+                #print( 'disable')
+            self.i_plot.update()
+
+        self.dark_mode_toggle.observe(dark_mode_toggle_cb)
+
+
 
         #---------------------
         self.substrates_toggle = Checkbox(
@@ -352,7 +398,8 @@ class SubstrateTab(object):
                             align_items='stretch',
                             flex_direction='row',
                             display='flex')) 
-        row1b = Box( [self.cells_toggle, self.cell_nucleus_toggle, self.cell_edges_toggle], layout=Layout(border='1px solid black',
+        # row1b = Box( [self.cells_toggle, self.cell_nucleus_toggle, self.cell_edges_toggle, self.cell_alpha_toggle], layout=Layout(border='1px solid black',
+        row1b = Box( [self.cells_toggle, self.cell_edges_toggle, self.cell_alpha_toggle], layout=Layout(border='1px solid black',
                             width='50%',
                             height='',
                             align_items='stretch',
@@ -367,7 +414,7 @@ class SubstrateTab(object):
                             flex_direction='row',
                             display='flex'))
         # row2b = Box( [self.substrates_toggle, self.grid_toggle], layout=Layout(border='1px solid black',
-        row2b = Box( [self.substrates_toggle, ], layout=Layout(border='1px solid black',
+        row2b = Box( [self.substrates_toggle, self.dark_mode_toggle ], layout=Layout(border='1px solid black',
                             width='50%',
                             height='',
                             align_items='stretch',
@@ -382,7 +429,11 @@ class SubstrateTab(object):
 
             self.download_svg_button = Download('svg.zip', style='warning', icon='cloud-download', 
                                             tooltip='You need to allow pop-ups in your browser', cb=self.download_svg_cb)
-            download_row = HBox([self.download_button.w, self.download_svg_button.w, Label("Download all cell plots (browser must allow pop-ups).")])
+
+            self.download_settings_button = Download('config.zip', style='warning', icon='cloud-download',
+                                            tooltip='Download XML configuration (settings) file.', cb=self.download_settings_cb )
+
+            download_row = HBox([self.download_button.w, self.download_svg_button.w, self.download_settings_button.w, Label("Download all cell plots (browser must allow pop-ups).")])
 
             # box_layout = Layout(border='0px solid')
             controls_box = VBox([row1, row2])  # ,width='50%', layout=box_layout)
@@ -549,6 +600,12 @@ class SubstrateTab(object):
             for f in glob.glob(file_str):
                 myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename path in the archive
 
+    def download_settings_cb(self):
+        file_str = os.path.join(self.output_dir, 'config.zip')
+        with zipfile.ZipFile('config.zip','w') as myzip:
+            for f in glob.glob(file_str):
+                myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename path in the archive
+
     def download_cb(self):
         file_xml = os.path.join(self.output_dir, '*.xml')
         file_mat = os.path.join(self.output_dir, '*.mat')
@@ -702,10 +759,13 @@ class SubstrateTab(object):
             print("Once output files are generated, click the slider.")   
             return
 
+        # set background color 
+        bgcolor = self.bgcolor;  # 1.0 for white 
+
         xlist = deque()
         ylist = deque()
         rlist = deque()
-        rgb_list = deque()
+        rgba_list = deque() # Paul Nov 2020 
 
         #  print('\n---- ' + fname + ':')
 #        tree = ET.parse(fname)
@@ -767,13 +827,29 @@ class SubstrateTab(object):
                 s = circle.attrib['fill']
                 # print("s=",s)
                 # print("type(s)=",type(s))
-                if (s[0:3] == "rgb"):  # if an rgb string, e.g. "rgb(175,175,80)" 
-                    rgb = list(map(int, s[4:-1].split(",")))  
-                    rgb[:] = [x / 255. for x in rgb]
+                if( s[0:4] == "rgba" ):
+                    background = bgcolor[0] * 255.0; # coudl also be 255.0 for white
+                    rgba_float =list(map(float,s[5:-1].split(",")))
+                    r = rgba_float[0]
+                    g = rgba_float[1]
+                    b = rgba_float[2]
+                    alpha = rgba_float[3]
+                    alpha *= 2.0; # cell_alpha_toggle
+                    if( not self.enable_alpha or (alpha > 1.0) ):
+                        alpha = 1.0
+                    rgba = [1,1,1,alpha]
+                    rgba[0:3] = [ np.round(r), np.round(g), np.round(b) ];  
+                    rgba[0:3] = [x / 255. for x in rgba[0:3] ]  
+                elif (s[0:3] == "rgb" ):  # if an rgb string, e.g. "rgb(175,175,80)" 
+                    rgba = [1,1,1,1.0]
+                    if( self.enable_alpha ):
+                        rgba = [1,1,1,self.default_alpha]
+                    rgba[0:3] = list(map(int, s[4:-1].split(",")))  
+                    rgba[0:3] = [x / 255. for x in rgba[0:3] ]
                 else:     # otherwise, must be a color name
                     rgb_tuple = mplc.to_rgb(mplc.cnames[s])  # a tuple
-                    rgb = [x for x in rgb_tuple]
-
+                    rgba = [1,1,1,1.0]
+                    rgba[0:3] = [x for x in rgb_tuple]
                 # test for bogus x,y locations (rwh TODO: use max of domain?)
                 too_large_val = 10000.
                 if (np.fabs(xval) > too_large_val):
@@ -792,11 +868,11 @@ class SubstrateTab(object):
                 xlist.append(xval)
                 ylist.append(yval)
                 rlist.append(rval)
-                rgb_list.append(rgb)
+
+                rgba_list.append(rgba)
 
                 # For .svg files with cells that *have* a nucleus, there will be a 2nd
                 if (not self.show_nucleus):
-                #if (not self.show_nucleus):
                     break
 
             num_cells += 1
@@ -811,7 +887,8 @@ class SubstrateTab(object):
         xvals = np.array(xlist)
         yvals = np.array(ylist)
         rvals = np.array(rlist)
-        rgbs = np.array(rgb_list)
+
+        rgbas = np.array(rgba_list)
         # print("xvals[0:5]=",xvals[0:5])
         # print("rvals[0:5]=",rvals[0:5])
         # print("rvals.min, max=",rvals.min(),rvals.max())
@@ -832,6 +909,9 @@ class SubstrateTab(object):
         plt.xlim(self.xmin, self.xmax)
         plt.ylim(self.ymin, self.ymax)
 
+        ax = plt.gca()
+        ax.set_facecolor(bgcolor)
+
         #   plt.xlim(axes_min,axes_max)
         #   plt.ylim(axes_min,axes_max)
         #   plt.scatter(xvals,yvals, s=rvals*scale_radius, c=rgbs)
@@ -843,33 +923,15 @@ class SubstrateTab(object):
 #        axx = fig.gca()
 #        print('fig.dpi=',fig.dpi) # = 72
 
-        #   im = ax.imshow(f.reshape(100,100), interpolation='nearest', cmap=cmap, extent=[0,20, 0,20])
-        #   ax.xlim(axes_min,axes_max)
-        #   ax.ylim(axes_min,axes_max)
-
-        # convert radii to radii in pixels
-        # ax2 = self.fig.gca()
-        # N = len(xvals)
-        # rr_pix = (ax2.transData.transform(np.vstack([rvals, rvals]).T) -
-        #             ax2.transData.transform(np.vstack([np.zeros(N), np.zeros(N)]).T))
-        # rpix, _ = rr_pix.T
-
-        # markers_size = (144. * rpix / self.fig.dpi)**2   # = (2*rpix / fig.dpi * 72)**2
-        # markers_size = markers_size/4000000.
-        # print('max=',markers_size.max())
-
         #rwh - temp fix - Ah, error only occurs when "edges" is toggled on
         if (self.show_edge):
             try:
-                # plt.scatter(xvals,yvals, s=markers_size, c=rgbs, edgecolor='black', linewidth=0.5)
-                self.circles(xvals,yvals, s=rvals, color=rgbs, edgecolor='black', linewidth=0.5)
+                self.circles(xvals,yvals, s=rvals, color=rgbas, edgecolor='black', linewidth=0.5 )
                 # cell_circles = self.circles(xvals,yvals, s=rvals, color=rgbs, edgecolor='black', linewidth=0.5)
-                # plt.sci(cell_circles)
             except (ValueError):
                 pass
         else:
-            # plt.scatter(xvals,yvals, s=markers_size, c=rgbs)
-            self.circles(xvals,yvals, s=rvals, color=rgbs)
+            self.circles(xvals,yvals, s=rvals, color=rgbas  )
 
         # if (self.show_tracks):
         #     for key in self.trackd.keys():
@@ -1022,14 +1084,14 @@ class SubstrateTab(object):
             contour_ok = True
             if (self.cmap_fixed_toggle.value):
                 try:
-                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                     substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                 except:
                     contour_ok = False
                     # print('got error on contourf 1.')
             else:    
                 try:
-                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                     substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                 except:
                     contour_ok = False
