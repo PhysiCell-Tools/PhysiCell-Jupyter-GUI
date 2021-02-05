@@ -17,6 +17,7 @@ except:
     pass
 # from svg import SVGTab
 from substrates import SubstrateTab
+from populations import PopulationsTab
 from animate_tab import AnimateTab
 from pathlib import Path
 import platform
@@ -56,6 +57,7 @@ if xml_root.find('.//cell_definitions'):
 
 # svg = SVGTab()
 sub = SubstrateTab()
+populations = PopulationsTab()
 animate_tab = AnimateTab()
 
 nanoHUB_flag = False
@@ -116,6 +118,7 @@ def read_config_cb(_b):
         # print("read_config_cb():  is_dir True, calling update_params")
         sub.update_params(config_tab, user_tab)
         sub.update(read_config.value)
+        populations.update(read_config.value)
     # else:  # may want to distinguish "DEFAULT" from other saved .xml config files
         # FIXME: really need a call to clear the visualizations
         # svg.update('')
@@ -249,6 +252,7 @@ def run_done_func(s, rdir):
     # and update visualizations
     # svg.update(rdir)
     sub.update(rdir)
+    populations.update(rdir)
 
     animate_tab.gen_button.disabled = False
 
@@ -299,6 +303,7 @@ def run_sim_func(s):
     # svg.update(tdir)
     # sub.update_params(config_tab)
     sub.update(tdir)
+    populations.update(tdir)
     # animate_tab.update(tdir)
 
     if nanoHUB_flag:
@@ -327,6 +332,7 @@ def outcb(s):
         # sub.update('')
         # sub.update_params(config_tab)
         sub.update()
+        populations.update()
     return s
 
 
@@ -360,6 +366,7 @@ def run_button_cb(s):
     # svg.update(tdir)
     # sub.update_params(config_tab)
     sub.update(tdir)
+    physiboss.update(tdir)
 
     subprocess.Popen(["../bin/myproj", "config.xml"])
 
@@ -401,13 +408,13 @@ tab_height = 'auto'
 tab_layout = widgets.Layout(width='auto',height=tab_height, overflow_y='scroll',)   # border='2px solid black',
 
 if xml_root.find('.//cell_definitions'):
-    titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Cell Types', 'Out: Plots', 'Animate']
-    tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, cell_types_tab.tab, sub.tab, animate_tab.tab],
+    titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Cell Types', 'Out: Plots', 'Out: Populations', 'Animate']
+    tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, cell_types_tab.tab, sub.tab, populations.tab, animate_tab.tab],
                    _titles={i: t for i, t in enumerate(titles)},
                    layout=tab_layout)
 else:
-    titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Out: Plots', 'Animate']
-    tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, sub.tab, animate_tab.tab],
+    titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Out: Plots', 'Out: Populations', 'Animate']
+    tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, sub.tab, populations.tab, animate_tab.tab],
                    _titles={i: t for i, t in enumerate(titles)},
                    layout=tab_layout)
 
