@@ -145,17 +145,47 @@ to_file = os.path.join(proj_src_dir, "VERSION.txt")
 print(from_file, " --> ", to_file)
 shutil.copy(from_file, to_file)
 
+# We want to copy (and slightly edit) the original config (.xml) file (in /config) into the app's /data directory.
 from_file = os.path.join(physicell_fullpath, "config", "PhysiCell_settings.xml")
 to_file = os.path.join(proj_fullpath, "data", "PhysiCell_settings.xml")
 print(from_file, " --> ", to_file)
 shutil.copy(from_file, to_file)
 
-print("   Editing ", to_file, ": <folder>output</folder> --> <folder>.</folder>")
-with open(to_file, 'r') as myfile:
-    new_text = myfile.read().replace('output', ".")
-with open(to_file, 'w') as myfile:
-    myfile.write(new_text)
+# Edit the output folder: "output" --> "."  (output will be diverted into the app's /tmpdir)
+# old_way = False
+# print("   Editing ", to_file, ": <folder>output</folder> --> <folder>.</folder>")
+# if old_way:
+#     with open(to_file, 'r') as myfile:
+#         new_text = myfile.read().replace('output', ".")  # a rather hacky way of doing this for now
+#     with open(to_file, 'w') as myfile:
+#         myfile.write(new_text)
+# else:
+tree = ET.parse(to_file)
+xml_root = tree.getroot()
+uep = xml_root.find('.//save//folder')  # find unique entry point
+uep.text = '.'
 
+uep = xml_root.find('.//parallel//omp_num_threads')
+uep.text = '4'
+
+uep2 = xml_root.find('.//initial_conditions//cell_positions//folder')
+print('\n >>>>>>>>>>>  uep2 (cell pos) = ',uep2)
+if uep2 != None:
+    print('>>>>>>>>>>>  changing <initial_conditions><folder> = data')
+    uep2.text = '../data'   # recall, the executable is in /bin
+
+tree.write(to_file)
+
+uep2 = xml_root.find('.//initial_conditions//cell_positions//filename')
+if uep2 == None:
+    print("******  WARNING: no initial_conditions//cell_positions//filename")
+csv_file = uep2.text
+from_file = os.path.join(physicell_fullpath, "config", csv_file)
+to_file = os.path.join(proj_fullpath, "data", csv_file)
+print(from_file, " --> ", to_file)
+shutil.copy(from_file, to_file)
+
+# Similar to the config file going into /data, we also want the original output/initial.xml to be in /data
 from_file = os.path.join(physicell_fullpath, "output", "initial.xml")
 to_file = os.path.join(proj_fullpath, "data", "initial.xml")
 print(from_file, " --> ", to_file)

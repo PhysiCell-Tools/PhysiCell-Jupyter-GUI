@@ -3,6 +3,7 @@
 import os
 from ipywidgets import Layout, Label, Text, Checkbox, Button, HBox, VBox, \
     FloatText, BoundedIntText, BoundedFloatText, HTMLMath, Dropdown
+from hublib.ui import FileUpload
 
 
 class ConfigTab(object):
@@ -58,6 +59,10 @@ class ConfigTab(object):
             disabled = disable_domain,
             layout=Layout(width=constWidth),
         )
+        self.toggle_virtual_walls = Checkbox(
+            description='Virtual walls',
+            layout=Layout(width='350px') )
+
 #            description='$Time_{max}$',
         self.tmax = BoundedFloatText(
             min=0.,
@@ -222,14 +227,54 @@ class ConfigTab(object):
         label_blankline = Label('')
         # toggle_2D_seed_row = HBox([toggle_prng, prng_seed])  # toggle2D
 
+        def upload_done_cb(w, name):
+            # Do something with the files here...
+            # We just print their names
+            print("%s uploaded" % name)
+
+            # reset clears and re-enables the widget for more uploads
+            # You may want to do this somewhere else, depending on your GUI
+            w.reset()
+
+        self.csv_upload= FileUpload(
+            '',
+            'Upload cells positions (.csv) from your local machine',
+             dir='data',
+             cb=upload_done_cb,
+             maxsize='1M',
+            # layout=Layout(width='350px') 
+        )
+        self.toggle_cells_csv = Checkbox(
+            description='Enable .csv',
+            layout=Layout(width='280px') )
+            # layout=Layout(width='350px') )
+
+        def toggle_cells_csv_cb(b):  # why can't I disable this widget?!
+            # print('---- toggle_cells_csv_cb')
+            if (self.toggle_cells_csv.value):
+                # self.csv_upload.w.disabled = False
+                # self.csv_upload.w.visible = False
+                self.csv_upload.visible = True
+            else:
+                # self.csv_upload.w.disable = True
+                # self.csv_upload.w.disabled = True
+                # self.csv_upload.w.visible = True
+                self.csv_upload.visible = False
+            
+        self.toggle_cells_csv.observe(toggle_cells_csv_cb)
 
         box_layout = Layout(border='1px solid')
+        upload_cells_hbox = HBox([self.csv_upload.w, self.toggle_cells_csv] , layout=Layout(border='1px solid', width='420px'))
+
+
 #        domain_box = VBox([label_domain,x_row,y_row,z_row], layout=box_layout)
-        domain_box = VBox([label_domain,x_row,y_row], layout=box_layout)
+        domain_box = VBox([label_domain,x_row,y_row, self.toggle_virtual_walls], layout=box_layout)
         self.tab = VBox([domain_box,
-#                         label_blankline, 
                          HBox([self.tmax, Label('min')]), self.omp_threads,  
                          svg_mat_output_row,
+                        label_blankline, 
+                        #  HBox([self.csv_upload.w, self.toggle_cells_csv]),
+                         upload_cells_hbox,
 #                         HBox([self.substrate[3], self.diffusion_coef[3], self.decay_rate[3] ]),
                          ])  # output_dir, toggle_2D_seed_
 #                         ], layout=tab_layout)  # output_dir, toggle_2D_seed_
@@ -247,7 +292,13 @@ class ConfigTab(object):
         self.zmin.value = float(xml_root.find(".//z_min").text)
         self.zmax.value = float(xml_root.find(".//z_max").text)
         self.zdelta.value = float(xml_root.find(".//dz").text)
+
+        if xml_root.find(".//options//virtual_wall_at_domain_edge").text.lower() == 'true':
+            self.toggle_virtual_walls.value = True
+        else:
+            self.toggle_virtual_walls.value = False
         
+
         self.tmax.value = float(xml_root.find(".//max_time").text)
         
         self.omp_threads.value = int(xml_root.find(".//omp_num_threads").text)
@@ -264,6 +315,14 @@ class ConfigTab(object):
         else:
             self.toggle_svg.value = False
         self.svg_interval.value = float(xml_root.find(".//SVG//interval").text)
+
+        # if xml_root.find(".//initial_conditions//cell_positions").text.lower() == 'true':
+        if xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"].lower() == 'true':
+            self.toggle_cells_csv.value = True
+        else:
+            self.toggle_cells_csv.value = False
+
+        self.toggle_cells_csv.description = xml_root.find(".//initial_conditions//cell_positions//filename").text
 
 
     # Read values from the GUI widgets and generate/write a new XML
@@ -282,6 +341,8 @@ class ConfigTab(object):
         xml_root.find(".//z_max").text = str(self.zmax.value)
         xml_root.find(".//dz").text = str(self.zdelta.value)
 
+        xml_root.find(".//options//virtual_wall_at_domain_edge").text = str(self.toggle_virtual_walls.value).lower()
+
         xml_root.find(".//max_time").text = str(self.tmax.value)
 
         xml_root.find(".//omp_num_threads").text = str(self.omp_threads.value)
@@ -290,6 +351,9 @@ class ConfigTab(object):
         xml_root.find(".//SVG").find(".//interval").text = str(self.svg_interval.value)
         xml_root.find(".//full_data").find(".//enable").text = str(self.toggle_mcds.value)
         xml_root.find(".//full_data").find(".//interval").text = str(self.mcds_interval.value)
+
+# uep.find('.//cell_definition[1]//phenotype//mechanics//options//set_absolute_equilibrium_distance').attrib['enabled'] = str(self.bool1.value)
+        xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"] = str(self.toggle_cells_csv.value)
 
         #    user_details = ET.SubElement(root, "user_details")
         #    ET.SubElement(user_details, "PhysiCell_settings", name="version").text = "devel-version"

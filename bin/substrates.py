@@ -153,9 +153,9 @@ class SubstrateTab(object):
         self.field_cmap.observe(self.mcds_field_cb)
 
         self.cmap_fixed_toggle = Checkbox(
-            description='Fixed substrate range?',
+            description='Fixed substrate range',
             disabled=False,
-            value=True,
+            value=False,
 #           layout=Layout(width=constWidth2),
         )
         self.cmap_fixed_toggle.observe(self.mcds_field_cb)
