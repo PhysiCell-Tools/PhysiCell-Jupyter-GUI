@@ -1,0 +1,73 @@
+<PhysiCell_settings version="devel-version">
+	<domain>
+		<x_min>-1000</x_min>
+		<x_max>1000</x_max>
+	</domain>
+
+	<cell_definitions>
+		<cell_definition name="A" ID="0" visible="true">
+			<p1>0</p1>
+			<p2>42</p2>
+			<p3>43</p3>
+			<custom_data>
+				<x>A</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A1" ID="1" parent_type="A">
+			<p1>1</p1>
+			<custom_data>
+				<x>A1</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A2" ID="2" parent_type="A">
+			<p1>2</p1>
+			<custom_data>
+				<x>A2</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A21" ID="3" parent_type="A2">
+			<p2>21</p2>
+			<custom_data>
+				<x>A21</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A22" ID="4" parent_type="A2">
+			<p2>22</p2>
+			<custom_data>
+				<x>A22</x> 
+			</custom_data>
+		</cell_definition>
+	</cell_definitions>
+	
+	<initial_conditions>
+		<cell_positions type="csv" enabled="false">
+			<folder>../data</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>		
+	
+	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		 
+		<cargo_signal_D type="double" units="micron/min^2">1e3</cargo_signal_D>
+		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> 
+		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
+		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> 
+		
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient> 
+		
+		<attached_worker_migration_bias type="double" units="dimensionless">1.0</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
+		 
+		<number_of_directors type="int" units="none">15</number_of_directors> 
+		<number_of_cargo_clusters type="int" units="none">100</number_of_cargo_clusters>
+		<number_of_workers type="int" units="none">50</number_of_workers>
+		 
+		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
+		 
+		<worker_color type="string" units="none">red</worker_color>
+		<cargo_color type="string" units="none">blue</cargo_color>
+		<director_color type="string" units="none">limegreen</director_color> 
+	</user_parameters>
+	
+</PhysiCell_settings>
