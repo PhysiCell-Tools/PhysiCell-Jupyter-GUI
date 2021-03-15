@@ -1,0 +1,20 @@
+<PhysiCell_settings version="devel-version">
+	<cell_definitions>
+		<cell_definition name="A" ID="0" visible="true">
+			<p1>41</p1>
+			<p2>42</p2>
+			<p3>43</p3>
+			<custom_data>
+				<x>A</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A1" ID="1" visible="true">
+			<p1>41</p1>
+			<p2>42</p2>
+			<p3>43</p3>
+			<custom_data>
+				<x>A</x> 
+			</custom_data>
+		</cell_definition>
+		</cell_definitions>
+</PhysiCell_settings>

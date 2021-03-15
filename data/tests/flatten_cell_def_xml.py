@@ -18,6 +18,24 @@ elif argc > 2:
     print('Error: too many args. Only 1 allowd (optional):  [.xml config file]')
 #print('argv=',sys.argv)
 
+"""
+For example:
+	<cell_definitions>
+		<cell_definition name="A" ID="0" visible="true">
+			<p1>0</p1>
+			<p2>42</p2>
+			<p3>43</p3>
+			<custom_data>
+				<x>A</x> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A1" ID="1" parent_type="A">
+			<p1>1</p1>
+			<custom_data>
+				<x>A1</x> 
+			</custom_data>
+		</cell_definition>
+"""
 
 #--------------------------------------------------
 print("\n--- Phase 0: Build a Python dict, cell_def, that contains keys = name and values = {'ID':value, 'parent':value}" )
@@ -76,7 +94,7 @@ for cd in list(cell_defs):
         # ET.SubElement(root_node,default_cell_def)
         # cell_defs.insert(0,default_cell_def)
 
-new_xml_file = "new_flat_config1.xml"
+# new_xml_file = "new_flat_config1.xml"
 # new_xml_file = "flat.xml"
 # tree.write(new_xml_file)
 #sys.exit()
@@ -113,87 +131,75 @@ for cd in cd_vals:
 #sys.exit()
 
 # NB! Need to save the file at this point and read it back in to continue processing.
-new_xml_file = "tmp.xml"
+new_xml_file = "tmp1.xml"
 tree.write(new_xml_file)
 
 #--------------------------------------------
-tree = ET.parse("tmp.xml")  
-#cell_defs = tree.find('cell_definitions')
+tree = ET.parse("tmp1.xml")  
 xml_root = tree.getroot()
 idx = 1
-# for cd in cell_def:
 cd_keys = list(cell_def.keys())
 for cd in cd_vals:
     if cd['parent'] == root_name:
     # if cd.values()['parent'] == root_name:
         new_name = cd_keys[idx]
+        new_ID = cd['ID']
         idx += 1
         # new_name = 'bar' + str(idx)
-        print('renaming child of ',root_name,' to be ',new_name)
+        print('renaming child of ',root_name,' to be ',new_name, 'with ID ',new_ID)
         xml_root.find("cell_definitions//cell_definition[" +str(idx) + "]").attrib['name'] = new_name
-        xml_root.find("cell_definitions//cell_definition[" +str(idx) + "]").attrib['ID'] = cd['ID']
+        xml_root.find("cell_definitions//cell_definition[" +str(idx) + "]").attrib['ID'] = new_ID
         # break
         # print(xml_root.find("cell_definitions//cell_definition[" + str(idx) + "]"))
 
-new_xml_file = "new_flat_config1.xml"
+new_xml_file = "tmp2.xml"
 # new_xml_file = "flat.xml"
+print("---> ",new_xml_file)
 tree.write(new_xml_file)
 
 sys.exit()
 #--------------------------------------------------
-tree = ET.parse("new_flat_config1.xml")  
-# tree = ET.parse(new_xml_file)  
-cell_defs = tree.find('cell_definitions')
-xml_root = tree.getroot()
+# tree = ET.parse("new_flat_config1.xml")  
+# cell_defs = tree.find('cell_definitions')
+# xml_root = tree.getroot()
 
-print("--- Change cell_def name for *each* leaf")
-idx = -1
-leaf_name = list(leaf_cell_defs.keys())
-for cell_def in list(cell_defs):
-# for leaf in leaf_cell_defs:
-    if idx >= 0:
-        cell_def.attrib['name'] = leaf_name[idx]
-        cell_def.attrib['ID'] = leaf_cell_defs[leaf_name[idx]]
-        # insert parent = "default" attribute
-        cell_def.set("parent","default")
+# print("--- Change cell_def name for *each* leaf")
+# idx = -1
+# leaf_name = list(leaf_cell_defs.keys())
+# for cell_def in list(cell_defs):
+#     if idx >= 0:
+#         cell_def.attrib['name'] = leaf_name[idx]
+#         cell_def.attrib['ID'] = leaf_cell_defs[leaf_name[idx]]
+#         cell_def.set("parent","default")  # insert parent = "default" attribute
 
-        print(cell_def.attrib['name'])
-    idx += 1
-    # cell_def.attrib['name'] = leaf
+#         print(cell_def.attrib['name'])
+#     idx += 1
 
-#tree = tree0
-# default_cell_def = xml_root.find("cell_definitions//cell_definition[@name='default']")
-# ET.SubElement(cell_defs, default_cell_def)
-
-new_xml_file = "new_flat_config1.xml"
-tree.write(new_xml_file)
-
-print("\nDone. Please check the output file: " + new_xml_file + "\n")
+# new_xml_file = "new_flat_config1.xml"
+# tree.write(new_xml_file)
+# print("\nDone. Please check the output file: " + new_xml_file + "\n")
 
 #--------------------------------------------------
-#  Now read the params from the original "immune" cell_definition and update them in each leaf immune cell def
-#  in the flattened .xml just created.
+# We want to replace all the XML elements and attributes in the (copied) parent's with the
+# newly defined values provided by its children.
+#
 print("\n===================================================================================")
-print("--- Phase 2: edit the new .xml so each immune cell type has its parent's params (<cell_definition name='immune' parent_type='default' ...>)")
+print("--- Phase 2: update all children's elements and attributes.")
 
 """
 for example:
-				<secretion>
-					<substrate name="pro-inflammatory cytokine">
-						<uptake_rate units="1/min">0.01</uptake_rate>
-					</substrate> 	
-					<substrate name="chemokine">
-						<uptake_rate units="1/min">0.01</uptake_rate>
-					</substrate> 	
-					<substrate name="debris">
-						<uptake_rate units="1/min">0.1</uptake_rate>
+    		<cell_definition name="A1" ID="1" parent_type="A">
+			<p1>1</p1>
+			<custom_data>
+				<x>A1</x> 
+			</custom_data>
 """
 
-tree_flat = ET.parse("new_flat_config1.xml")  
-# tree_flat = ET.parse(new_xml_file) 
-# tree = ET.parse("PhysiCell_settings.xml")  
+tree_flat = ET.parse("tmp2.xml")  
 xml_flat_root = tree_flat.getroot()
 
+sys.exit()
+#--------------------------------------------------
 #leaf_immune_cell_defs = ["CD8 Tcell", "macrophage", "neutrophil", "DC", "CD4 Tcell","fibroblasts"]
 # leaf_immune_cell_defs = ["CD8 Tcell"]
 def update_all_immune_cell_def_params(xmlpath, save_param_val, substrate_name_in):
@@ -284,7 +290,8 @@ def recurse_node(root,xmlpath,substrate_name):
 
 
 idx = -1
-tree_orig = ET.parse("PhysiCell_settings.xml")  
+# tree_orig = ET.parse("PhysiCell_settings.xml")  
+tree_orig = ET.parse(xml_file)  
 # tree = ET.parse("new_flat_config1.xml")  
 xml_orig = tree_orig.getroot()
 uep = None
@@ -305,7 +312,7 @@ new_xml_file = "new_flat_config2.xml"
 tree_flat.write(new_xml_file)
 print("\nDone. Please check the output file: " + new_xml_file + "\n")
 
-# sys.exit()
+sys.exit()
 #--------------------------------------------------
 print("\n===================================================================================")
 print("--- Phase 3: edit the new .xml so each immune cell type has its specific params (from the ORIGINAL .xml).")
