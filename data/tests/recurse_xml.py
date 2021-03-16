@@ -1,5 +1,13 @@
+# recurse_xml.py - convert a hierarchical PhysiCell config file (.xml), i.e.,
+#                   with inheritance of parents in <cell_definitions>,
+#                   to a "flattened" (expanded) config file.
+#
+# Author: Randy Heiland
+#
+
 import xml.etree.ElementTree as ET
 import sys
+# import shutil
 
 xml_hier_file = "PhysiCell_settings.xml"
 xml_flat_file = "tmp2.xml"
@@ -17,6 +25,7 @@ tree_hier = ET.parse(xml_hier_file)
 root_hier = tree_hier.getroot()
 
 # The newly constructed, expanded (flattened) XML
+# shutil.copy(xml_hier_file, xml_flat_file)
 tree_flat = ET.parse(xml_flat_file)
 root_flat = tree_flat.getroot()
 cell_defs_flat = root_flat.find("cell_definitions")
