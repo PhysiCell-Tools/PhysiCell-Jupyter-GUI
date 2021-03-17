@@ -14,11 +14,104 @@ import string
 import copy
 import os
 
-orig_xml_file = "PhysiCell_settings.xml"
+prefix = ""
+full_path = ""
+last_tag = ""
+
+def print_children(parent):
+    global cell_def_name, prefix, full_path, last_tag #, len_leaf_text
+    for child in parent:
+        if child.tag == 'cell_definition':
+            cell_def_name = child.attrib['name']
+            print("==== cell_def_name=",cell_def_name,'\n')
+
+        print(prefix,child.tag,child.attrib)
+        full_path += '//' + child.tag
+        # full_path += '//' + child.tag
+        last_tag = child.tag
+        print('full_path=',full_path)
+    # print(child.attrib)
+        prefix = prefix + "--"
+        print_children(child)
+#  prefix = prefix - "--"
+    #-----------------------------
+    # Reached a leaf element at this point. Update the corresponding element in the new, expanded XML.
+    # full_path = full_path[0:len(full_path)-len(last_tag)-2]
+    # print("   leaf path=",full_path[2:])
+    try:
+        leaf_text = cell_defs_hier.find(full_path[2:]).text
+        leaf_text = leaf_text.strip('\n')
+        leaf_text = leaf_text.strip('\t')
+        leaf_text = leaf_text.strip()
+        print('    leaf_text=',leaf_text)
+        len_leaf_text = len(leaf_text)
+        print('    len_leaf_text=',len_leaf_text)
+
+        # Update the expanded XML
+        leaf_text2 = cell_defs_flat.find(full_path[2:]).text
+        print('    leaf_text2=',leaf_text2)
+        if (len_leaf_text > 0):
+            find_str = full_path[2:]
+            new_str = "cell_definition[@name='" + cell_def_name + "']"
+            print("    new_str=",new_str)
+            find_str = find_str.replace("cell_definition",  new_str)
+            print("  *** find_str=",find_str)
+            print("  *** for cell_def_name ",cell_def_name,": replace ",cell_defs_flat.find(find_str).text," with ", leaf_text)
+            # cell_defs_flat.find(find_str).text = leaf_text
+            cell_defs_flat.find(find_str).text = cell_defs_hier.find(find_str).text
+    except:
+        print('    --- except: leaf_text')
+        pass
+    try:
+        idx = full_path.rindex("//")  # strip off the last element
+        full_path = full_path[0:idx]
+    except:
+        pass
+    print("~~~ popped out: full_path=",full_path)
+    
+    # parent_cell_def = xml_root.find("cell_definitions + ")
+
+    prefix = prefix[2:]
+
+def recurse_update_cell_def(xml_hier_file, xml_flat_file, out_xml_file):
+    # The original, hierarchical XML
+    print("\n\n     ------- parsing ",xml_hier_file)
+    tree_hier = ET.parse(xml_hier_file)
+    root_hier = tree_hier.getroot()
+
+    # The newly constructed, expanded (flattened) XML
+    # shutil.copy(xml_hier_file, xml_flat_file)
+    tree_flat = ET.parse(xml_flat_file)
+    root_flat = tree_flat.getroot()
+    cell_defs_flat = root_flat.find("cell_definitions")
+
+    num_nodes = 0
+    #for node in root.iter():
+    # for node in []:
+    #     print(node)
+    #     num_nodes += 1
+    #print("num_nodes=",num_nodes)
+
+    print('----- recursive -----')
+    prefix = ""
+    full_path = ""
+    last_tag = ""
+    # parent_cell_def = xml_root.find("cell_definitions//cell_definition")
+    cell_defs_hier = root_hier.find("cell_definitions")
+
+    # print_children(root)
+    print_children(cell_defs_hier)
+
+    print("---> ",out_xml_file)
+    tree_flat.write(out_xml_file)
+
+#========================================================================
+
+xml_file = "PhysiCell_settings.xml"
 argc = len(sys.argv)
 print('argc=',argc)
 if argc == 2:
-    orig_xml_file = sys.argv[1]
+    xml_file = sys.argv[1]
 elif argc > 2:
     print('Error: too many args. Only 1 allowd (optional):  [.xml config file]')
 #print('argv=',sys.argv)
@@ -46,7 +139,7 @@ For example:
 print("\n--- Phase 0: Build cell_defs_dict: {cell_def_name : {'ID':value, 'parent':value}, ...} \n\
          and parent_children_dict: {parent_cell_def_name : [child1, child2, ...], ...}")
 
-tree = ET.parse(orig_xml_file)  
+tree = ET.parse(xml_file)  
 xml_root = tree.getroot()
 
 # "cell_def" will be a dict with key = cell_def name, value = {'ID':value, 'parent':value}
@@ -183,63 +276,10 @@ tree.write(new_xml_file)
 
 
 print("\n------> calling recurse_update_cell_def() !!")
-print("         with ",orig_xml_file, new_xml_file)
-cmd = "python recurse_xml.py " + orig_xml_file + "  " + new_xml_file
-os.system(cmd)  # might consider better alternatives later
-
-# sys.exit()
-
-#=================================================================================
-#---------  iterate over all children -----------
-new_xml_file = "tmp3.xml"   # output from recurse_xml.py
-idx = 1
-parent_name = list(parent_children_dict.keys())[idx]
-print("  parent_name=",parent_name)
-children_list = list(parent_children_dict.values())[idx]
-print("  children_list=",children_list)
-# tree = ET.parse("tmp1.xml")  
-tree = ET.parse(new_xml_file)  
-xml_root = tree.getroot()
-cell_defs = tree.find('cell_definitions')
-# print('cell_defs=',cell_defs)
-# parent_cell_def = xml_root.find("cell_definitions//cell_definition")
-parent_cell_def = xml_root.find("cell_definitions//cell_definition[@name='" + parent_name +"']")
-root_name = parent_cell_def.attrib['name'] 
-print("   root_name = ",root_name)
-# print("--- Insert duplicate root cell_def for of its children")
-cd_vals = list(cell_defs_dict.values())
-print("cd_vals = ",cd_vals)
-
-# for cd in cd_vals:
-for child in children_list:
-    # if cd['parent'] == root_name:   # handles just the children of root (not grandchildren, etc)
-
-        print('inserting child of ',root_name)
-        new_node = copy.deepcopy(parent_cell_def)
-        new_node.attrib['name'] = child
-        print('ID= ', cell_defs_dict[child]['ID'])
-        new_node.attrib['ID'] = cell_defs_dict[child]['ID']
-        # parent_cell_def.attrib['ID'] = cd['ID']
-        # cell_defs.insert(0,parent_cell_def)
-        # cell_defs.insert(0,new_node)
-        cell_defs.append(new_node)
-        # parent_cell_def.attrib['name'] = 'bar'
-        # child = xml_root.find("cell_definitions//cell_definition[2]")
-#sys.exit()
-#cell_def_all = tree.findall('cell_definition')
-
-new_xml_file = "tmp_idx1.xml"
-# new_xml_file = "flat.xml"
-print("---> ",new_xml_file)
-tree.write(new_xml_file)
-
-
-print("\n------> calling recurse_update_cell_def() !!")
-print("         with ",orig_xml_file, new_xml_file)
+print("         with ",xml_file, new_xml_file)
 # recurse_update_cell_def(xml_hier_file, xml_flat_file, out_xml_file)
 # recurse_update_cell_def(xml_file, new_xml_file, "final.xml")
-cmd = "python recurse_xml.py " + orig_xml_file + " " + new_xml_file
-# cmd = "python recurse_xml.py " + "tmp3.xml" + " " + new_xml_file
-os.system(cmd)  # might consider better alternatives later
+cmd = "python recurse_xml.py " + xml_file + " tmp2.xml"
+#os.system(cmd)  # might consider better alternatives later
 
 sys.exit()
