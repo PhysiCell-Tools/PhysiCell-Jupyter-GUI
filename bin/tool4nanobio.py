@@ -48,6 +48,7 @@ full_xml_filename = os.path.abspath(xml_file)
 tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
 xml_root = tree.getroot()
 
+config_tab = ConfigTab(xml_root)
 microenv_tab = MicroenvTab()
 user_tab = UserTab()
 

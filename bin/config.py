@@ -8,7 +8,8 @@ from hublib.ui import FileUpload
 
 class ConfigTab(object):
 
-    def __init__(self):
+    # def __init__(self):
+    def __init__(self, xml_root):
         
 #        micron_units = HTMLMath(value=r"$\mu M$")
         micron_units = Label('micron')   # use "option m" (Mac, for micro symbol)
@@ -268,16 +269,28 @@ class ConfigTab(object):
 
 
 #        domain_box = VBox([label_domain,x_row,y_row,z_row], layout=box_layout)
-        domain_box = VBox([label_domain,x_row,y_row, self.toggle_virtual_walls], layout=box_layout)
-        self.tab = VBox([domain_box,
+        uep = xml_root.find(".//options//virtual_wall_at_domain_edge")
+        if uep:
+            domain_box = VBox([label_domain,x_row,y_row, self.toggle_virtual_walls], layout=box_layout)
+        else:
+            domain_box = VBox([label_domain,x_row,y_row], layout=box_layout)
+
+        uep = xml_root.find(".//options//virtual_wall_at_domain_edge")
+        if uep:
+            self.tab = VBox([domain_box,
                          HBox([self.tmax, Label('min')]), self.omp_threads,  
                          svg_mat_output_row,
                         label_blankline, 
                         #  HBox([self.csv_upload.w, self.toggle_cells_csv]),
                          upload_cells_hbox,
 #                         HBox([self.substrate[3], self.diffusion_coef[3], self.decay_rate[3] ]),
-                         ])  # output_dir, toggle_2D_seed_
 #                         ], layout=tab_layout)  # output_dir, toggle_2D_seed_
+                         ])  
+        else:
+            self.tab = VBox([domain_box,
+                         HBox([self.tmax, Label('min')]), self.omp_threads,  
+                         svg_mat_output_row,
+                         ])  
 
     # Populate the GUI widgets with values from the XML
     def fill_gui(self, xml_root):
@@ -293,7 +306,8 @@ class ConfigTab(object):
         self.zmax.value = float(xml_root.find(".//z_max").text)
         self.zdelta.value = float(xml_root.find(".//dz").text)
 
-        if xml_root.find(".//options//virtual_wall_at_domain_edge").text.lower() == 'true':
+        uep = xml_root.find(".//options//virtual_wall_at_domain_edge")
+        if uep and (uep.text.lower() == 'true'):
             self.toggle_virtual_walls.value = True
         else:
             self.toggle_virtual_walls.value = False
@@ -316,13 +330,15 @@ class ConfigTab(object):
             self.toggle_svg.value = False
         self.svg_interval.value = float(xml_root.find(".//SVG//interval").text)
 
-        # if xml_root.find(".//initial_conditions//cell_positions").text.lower() == 'true':
-        if xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"].lower() == 'true':
-            self.toggle_cells_csv.value = True
-        else:
-            self.toggle_cells_csv.value = False
+        # if xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"].lower() == 'true':
+        uep = xml_root.find(".//initial_conditions//cell_positions")
+        if uep:
+            if uep.attrib["enabled"].lower() == 'true':
+                self.toggle_cells_csv.value = True
+            else:
+                self.toggle_cells_csv.value = False
 
-        self.toggle_cells_csv.description = xml_root.find(".//initial_conditions//cell_positions//filename").text
+            self.toggle_cells_csv.description = xml_root.find(".//initial_conditions//cell_positions//filename").text
 
 
     # Read values from the GUI widgets and generate/write a new XML
@@ -353,7 +369,10 @@ class ConfigTab(object):
         xml_root.find(".//full_data").find(".//interval").text = str(self.mcds_interval.value)
 
 # uep.find('.//cell_definition[1]//phenotype//mechanics//options//set_absolute_equilibrium_distance').attrib['enabled'] = str(self.bool1.value)
-        xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"] = str(self.toggle_cells_csv.value)
+        # xml_root.find(".//initial_conditions//cell_positions").attrib["enabled"] = str(self.toggle_cells_csv.value)
+        uep = xml_root.find(".//initial_conditions//cell_positions")
+        if uep:
+            uep.attrib["enabled"] = str(self.toggle_cells_csv.value)
 
         #    user_details = ET.SubElement(root, "user_details")
         #    ET.SubElement(user_details, "PhysiCell_settings", name="version").text = "devel-version"
