@@ -357,7 +357,8 @@ class ConfigTab(object):
         xml_root.find(".//z_max").text = str(self.zmax.value)
         xml_root.find(".//dz").text = str(self.zdelta.value)
 
-        xml_root.find(".//options//virtual_wall_at_domain_edge").text = str(self.toggle_virtual_walls.value).lower()
+        if xml_root.find(".//options//virtual_wall_at_domain_edge"):
+            xml_root.find(".//options//virtual_wall_at_domain_edge").text = str(self.toggle_virtual_walls.value).lower()
 
         xml_root.find(".//max_time").text = str(self.tmax.value)
 
