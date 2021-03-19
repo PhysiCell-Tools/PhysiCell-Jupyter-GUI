@@ -40,7 +40,7 @@ else:
 
 # create the tabs, but don't display yet
 about_tab = AboutTab()
-config_tab = ConfigTab()
+# config_tab = ConfigTab()
 
 xml_file = os.path.join('data', 'PhysiCell_settings.xml')
 full_xml_filename = os.path.abspath(xml_file)
