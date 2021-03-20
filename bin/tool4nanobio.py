@@ -54,6 +54,7 @@ user_tab = UserTab()
 
 if xml_root.find('.//cell_definitions'):
     cell_types_tab = CellTypesTab()
+    cell_types_tab.display_cell_type_default()
 
 # svg = SVGTab()
 sub = SubstrateTab()
