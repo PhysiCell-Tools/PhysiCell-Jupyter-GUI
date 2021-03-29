@@ -3,7 +3,16 @@
 import os
 from ipywidgets import Layout, Label, Text, Checkbox, Button, HBox, VBox, \
     FloatText, BoundedIntText, BoundedFloatText, HTMLMath, Dropdown
-from hublib.ui import FileUpload
+
+hublib_flag = True
+if platform.system() != 'Windows':
+    try:
+#        print("Trying to import hublib.ui")
+        from hublib.ui import FileUpload
+    except:
+        hublib_flag = False
+else:
+    hublib_flag = False
 
 
 class ConfigTab(object):
@@ -237,14 +246,15 @@ class ConfigTab(object):
             # You may want to do this somewhere else, depending on your GUI
             w.reset()
 
-        self.csv_upload= FileUpload(
-            '',
-            'Upload cells positions (.csv) from your local machine',
-             dir='data',
-             cb=upload_done_cb,
-             maxsize='1M',
-            # layout=Layout(width='350px') 
-        )
+        if (hublib_flag):
+            self.csv_upload= FileUpload(
+                '',
+                'Upload cells positions (.csv) from your local machine',
+                dir='data',
+                cb=upload_done_cb,
+                maxsize='1M',
+                # layout=Layout(width='350px') 
+            )
         self.toggle_cells_csv = Checkbox(
             description='Enable .csv',
             layout=Layout(width='280px') )
@@ -252,20 +262,20 @@ class ConfigTab(object):
 
         def toggle_cells_csv_cb(b):  # why can't I disable this widget?!
             # print('---- toggle_cells_csv_cb')
-            if (self.toggle_cells_csv.value):
-                # self.csv_upload.w.disabled = False
-                # self.csv_upload.w.visible = False
-                self.csv_upload.visible = True
-            else:
-                # self.csv_upload.w.disable = True
-                # self.csv_upload.w.disabled = True
-                # self.csv_upload.w.visible = True
-                self.csv_upload.visible = False
+            if (hublib_flag):
+                if (self.toggle_cells_csv.value):
+                    # self.csv_upload.w.disabled = False
+                    self.csv_upload.visible = True
+                else:
+                    self.csv_upload.visible = False
             
         self.toggle_cells_csv.observe(toggle_cells_csv_cb)
 
         box_layout = Layout(border='1px solid')
-        upload_cells_hbox = HBox([self.csv_upload.w, self.toggle_cells_csv] , layout=Layout(border='1px solid', width='420px'))
+        if (hublib_flag):
+            upload_cells_hbox = HBox([self.csv_upload.w, self.toggle_cells_csv] , layout=Layout(border='1px solid', width='420px'))
+        else:
+            upload_cells_hbox = HBox([self.toggle_cells_csv] , layout=Layout(border='1px solid', width='420px'))
 
 
 #        domain_box = VBox([label_domain,x_row,y_row,z_row], layout=box_layout)
