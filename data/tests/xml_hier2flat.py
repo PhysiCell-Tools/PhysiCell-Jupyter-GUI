@@ -14,6 +14,8 @@ import string
 import copy
 import os
 
+show_debug = False
+
 orig_xml_file = "PhysiCell_settings.xml"
 argc = len(sys.argv)
 print('argc=',argc)
@@ -26,18 +28,24 @@ elif argc > 2:
 """
 For example:
 	<cell_definitions>
-		<cell_definition name="A" ID="0" visible="true">
+		<cell_definition name="A" ID="0" visible="false">
 			<p1>0</p1>
 			<p2>42</p2>
 			<p3>43</p3>
 			<custom_data>
-				<x>A</x> 
+				<cval>0.0</cval> 
 			</custom_data>
 		</cell_definition>
 		<cell_definition name="A1" ID="1" parent_type="A">
 			<p1>1</p1>
 			<custom_data>
-				<x>A1</x> 
+				<cval>1.1</cval> 
+			</custom_data>
+		</cell_definition>
+		<cell_definition name="A2 ID="2" parent_type="A">
+			<p1>2</p1>
+			<custom_data>
+				<cval>2.2</cval> 
 			</custom_data>
 		</cell_definition>
 """
@@ -65,6 +73,9 @@ for cd in list(cell_defs):
         attrib_dict['parent'] = cd.attrib['parent_type']
     else:
         attrib_dict['parent'] = None
+
+    if 'visible' in cd.attrib.keys():
+        attrib_dict['visible'] = cd.attrib['visible']
 
     # if 'parent_type' in cd.attrib.keys():
     #     children_list.append(cd.attrib['name'])
@@ -114,10 +125,12 @@ print("\n--- Phase 1: Remove all <cell_definition> nodes with a 'parent_type' at
 cell_defs = tree.find('cell_definitions')
 for cd in list(cell_defs):
     # print(cell_def.tag, cell_defs_dict.attrib['name'])
-    print(cd.attrib)
-    print(cd.attrib.keys())
+    if show_debug:
+        print(cd.attrib)
+        print(cd.attrib.keys())
     if ('parent_type' in cd.attrib.keys()):
-        print("--- removing ", cd.attrib['name'])
+        if show_debug:
+            print("--- removing ", cd.attrib['name'])
         cell_defs.remove(cd)
 
 new_xml_file = "tmp1.xml"
@@ -135,54 +148,54 @@ tree.write(new_xml_file)
 #---------  iterate over all parents -----------
 print("\n--- Phase 2: For each child of 'parent_type', make a copy of its parent.")
 print('list(parent_children_dict.keys()) = ',list(parent_children_dict.keys()))
-print('list(parent_children_dict.keys())[0] = ',list(parent_children_dict.keys())[0])
-print('list(parent_children_dict.values())[0] = ',list(parent_children_dict.values())[0])
-# parent_name = 'A'
+# print('list(parent_children_dict.keys())[0] = ',list(parent_children_dict.keys())[0])
+# print('list(parent_children_dict.values())[0] = ',list(parent_children_dict.values())[0])
 
-#---------  iterate over all children -----------
+#---------  iterate over all parents -----------
 idx = 0
-parent_name = list(parent_children_dict.keys())[idx]
+try:
+    parent_name = list(parent_children_dict.keys())[idx]
+except:
+    print("**** No more parents to process.")
+    sys.exit()
 print("  parent_name=",parent_name)
 children_list = list(parent_children_dict.values())[idx]
 print("  children_list=",children_list)
-# tree = ET.parse("tmp1.xml")  
 tree = ET.parse(new_xml_file)  
 xml_root = tree.getroot()
 cell_defs = tree.find('cell_definitions')
 # print('cell_defs=',cell_defs)
-# parent_cell_def = xml_root.find("cell_definitions//cell_definition")
 parent_cell_def = xml_root.find("cell_definitions//cell_definition[@name='" + parent_name +"']")
 root_name = parent_cell_def.attrib['name'] 
-print("   root_name = ",root_name)
-# print("--- Insert duplicate root cell_def for of its children")
+if show_debug:
+    print("   root_name = ",root_name)
 cd_vals = list(cell_defs_dict.values())
-print("cd_vals = ",cd_vals)
+if show_debug:
+    print("cd_vals = ",cd_vals)
 
-# for cd in cd_vals:
 for child in children_list:
-    # if cd['parent'] == root_name:   # handles just the children of root (not grandchildren, etc)
-
+    if show_debug:
         print('inserting child of ',root_name)
-        new_node = copy.deepcopy(parent_cell_def)
-        new_node.attrib['name'] = child
         print('ID= ', cell_defs_dict[child]['ID'])
-        new_node.attrib['ID'] = cell_defs_dict[child]['ID']
-        # parent_cell_def.attrib['ID'] = cd['ID']
-        # cell_defs.insert(0,parent_cell_def)
-        # cell_defs.insert(0,new_node)
-        cell_defs.append(new_node)
-        # parent_cell_def.attrib['name'] = 'bar'
-        # child = xml_root.find("cell_definitions//cell_definition[2]")
-#sys.exit()
-#cell_def_all = tree.findall('cell_definition')
+    new_node = copy.deepcopy(parent_cell_def)
+    new_node.attrib['name'] = child
+    new_node.attrib['ID'] = cell_defs_dict[child]['ID']
 
-new_xml_file = "tmp2.xml"
-# new_xml_file = "flat.xml"
+    if 'visible' in cell_defs_dict[child].keys():
+        # print("---- inserting visible attrib since in ",cell_defs_dict[child].keys())
+        new_node.attrib['visible'] = cell_defs_dict[child]['visible']
+    else:
+        # print("---- inserting visible=true attrib since in it was absent ")
+        new_node.attrib['visible'] = "true"
+
+    cell_defs.append(new_node)
+
+# new_xml_file = "tmp2.xml"
+new_xml_file = "tmp_flat.xml"
 print("---> ",new_xml_file)
 tree.write(new_xml_file)
 
-
-print("\n------> calling recurse_update_cell_def() !!")
+print("\n------> calling recurse_xml()")
 print("         with ",orig_xml_file, new_xml_file)
 cmd = "python recurse_xml.py " + orig_xml_file + "  " + new_xml_file
 os.system(cmd)  # might consider better alternatives later
@@ -190,56 +203,62 @@ os.system(cmd)  # might consider better alternatives later
 # sys.exit()
 
 #=================================================================================
-#---------  iterate over all children -----------
-new_xml_file = "tmp3.xml"   # output from recurse_xml.py
+#---------  iterate over next parent -----------
+# new_xml_file = "tmp3.xml"   # output from recurse_xml.py
+# new_xml_file = "recurse_xml_out.xml"   # output from recurse_xml.py
+new_xml_file = "flat_xml_out.xml"   # NOTE: this should be the same name as used in recurse_xml.py !
 idx = 1
-parent_name = list(parent_children_dict.keys())[idx]
+try:
+    parent_name = list(parent_children_dict.keys())[idx]
+except:
+    print("**** No more parents to process.\n")
+    print("\n**************************************************")
+    print("  YOU SHOULD CHECK that the output file, " + new_xml_file + ", does indeed define your model correctly.")
+    print("  And it is up to you to rename this file to be whatever name you want.")
+    print("**************************************************\n")
+
+    sys.exit()
+
 print("  parent_name=",parent_name)
 children_list = list(parent_children_dict.values())[idx]
 print("  children_list=",children_list)
-# tree = ET.parse("tmp1.xml")  
 tree = ET.parse(new_xml_file)  
 xml_root = tree.getroot()
 cell_defs = tree.find('cell_definitions')
 # print('cell_defs=',cell_defs)
-# parent_cell_def = xml_root.find("cell_definitions//cell_definition")
 parent_cell_def = xml_root.find("cell_definitions//cell_definition[@name='" + parent_name +"']")
 root_name = parent_cell_def.attrib['name'] 
-print("   root_name = ",root_name)
-# print("--- Insert duplicate root cell_def for of its children")
+if show_debug:
+    print("   root_name = ",root_name)
 cd_vals = list(cell_defs_dict.values())
-print("cd_vals = ",cd_vals)
+if show_debug:
+    print("cd_vals = ",cd_vals)
 
-# for cd in cd_vals:
 for child in children_list:
-    # if cd['parent'] == root_name:   # handles just the children of root (not grandchildren, etc)
-
+    if show_debug:
         print('inserting child of ',root_name)
-        new_node = copy.deepcopy(parent_cell_def)
-        new_node.attrib['name'] = child
         print('ID= ', cell_defs_dict[child]['ID'])
-        new_node.attrib['ID'] = cell_defs_dict[child]['ID']
-        # parent_cell_def.attrib['ID'] = cd['ID']
-        # cell_defs.insert(0,parent_cell_def)
-        # cell_defs.insert(0,new_node)
-        cell_defs.append(new_node)
-        # parent_cell_def.attrib['name'] = 'bar'
-        # child = xml_root.find("cell_definitions//cell_definition[2]")
-#sys.exit()
-#cell_def_all = tree.findall('cell_definition')
+    new_node = copy.deepcopy(parent_cell_def)
+    new_node.attrib['name'] = child
+    new_node.attrib['ID'] = cell_defs_dict[child]['ID']
 
-new_xml_file = "tmp_idx1.xml"
-# new_xml_file = "flat.xml"
+    if 'visible' in cell_defs_dict[child].keys():
+        # print("---- inserting visible attrib since in ",cell_defs_dict[child].keys())
+        new_node.attrib['visible'] = cell_defs_dict[child]['visible']
+    else:
+        # print("---- inserting visible=true attrib since in it was absent ")
+        new_node.attrib['visible'] = "true"
+
+    cell_defs.append(new_node)
+
+# new_xml_file = "tmp_idx1.xml"
+new_xml_file = "tmp_flat.xml"
 print("---> ",new_xml_file)
 tree.write(new_xml_file)
 
-
-print("\n------> calling recurse_update_cell_def() !!")
+print("\n------> calling recurse_xml()")
 print("         with ",orig_xml_file, new_xml_file)
-# recurse_update_cell_def(xml_hier_file, xml_flat_file, out_xml_file)
-# recurse_update_cell_def(xml_file, new_xml_file, "final.xml")
 cmd = "python recurse_xml.py " + orig_xml_file + " " + new_xml_file
-# cmd = "python recurse_xml.py " + "tmp3.xml" + " " + new_xml_file
 os.system(cmd)  # might consider better alternatives later
 
 sys.exit()

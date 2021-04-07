@@ -66,9 +66,10 @@ def print_children(parent):
                 print("==== cell_def_name=",cell_def_name,'\n')
         elif child.tag == 'substrate' and parent.tag =='secretion':  # i.e., //secretion//substrate
         # elif child.tag == 'substrate':
-            print("\n===================== FOUND //secretion//substrate!! child.tag=",child.tag)
-            print("\n===================== parent.tag=",parent.tag)
-            print("===================== name=",child.attrib['name'])
+            if show_debug:
+                print("\n===================== FOUND //secretion//substrate!! child.tag=",child.tag)
+                print("\n===================== parent.tag=",parent.tag)
+                print("===================== name=",child.attrib['name'])
             secretion_substrate_name = child.attrib['name']
             # print("===================== exiting!\n")
             # sys.exit()
@@ -111,7 +112,8 @@ def print_children(parent):
             find_str = find_str.replace("cell_definition",  new_str)
             if find_str.find('//secretion//substrate//'):
                 # <substrate name="director signal">
-                print(">>>>>>>>>>>>>>>>>>   found //secretion//substrate//")
+                if show_debug:
+                    print(">>>>>>>>>>>>>>>>>>   found //secretion//substrate//")
                 new_substrate_str = "substrate[@name='" + secretion_substrate_name + "']"
                 find_str = find_str.replace("substrate",  new_substrate_str)
             if show_debug:
@@ -137,7 +139,8 @@ def print_children(parent):
 print_children(cell_defs_hier)
 
 # new_xml_file = "tmp3.xml"
-new_xml_file = "recurse_xml_out.xml"
+# new_xml_file = "recurse_xml_out.xml"
+new_xml_file = "flat_xml_out.xml"
 print("---> ",new_xml_file)
 tree_flat.write(new_xml_file)
 

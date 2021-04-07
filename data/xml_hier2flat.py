@@ -205,12 +205,18 @@ os.system(cmd)  # might consider better alternatives later
 #=================================================================================
 #---------  iterate over next parent -----------
 # new_xml_file = "tmp3.xml"   # output from recurse_xml.py
-new_xml_file = "recurse_xml_out.xml"   # output from recurse_xml.py
+# new_xml_file = "recurse_xml_out.xml"   # output from recurse_xml.py
+new_xml_file = "flat_xml_out.xml"   # NOTE: this should be the same name as used in recurse_xml.py !
 idx = 1
 try:
     parent_name = list(parent_children_dict.keys())[idx]
 except:
-    print("**** No more parents to process.")
+    print("**** No more parents to process.\n")
+    print("\n**************************************************")
+    print("  YOU SHOULD CHECK that the output file, " + new_xml_file + ", does indeed define your model correctly.")
+    print("  And it is up to you to rename this file to be whatever name you want.")
+    print("**************************************************\n")
+
     sys.exit()
 
 print("  parent_name=",parent_name)
