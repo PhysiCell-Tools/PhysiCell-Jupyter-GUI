@@ -1,6 +1,7 @@
 # Config Tab
 
 import os
+import platform
 from ipywidgets import Layout, Label, Text, Checkbox, Button, HBox, VBox, \
     FloatText, BoundedIntText, BoundedFloatText, HTMLMath, Dropdown
 
