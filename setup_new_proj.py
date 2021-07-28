@@ -50,11 +50,12 @@ if (num_args > 4):
     make_file = sys.argv[4]
     main_cpp_file = sys.argv[5]
 
-print("\n STEP 1: copy tool4nanobio to new project:\n")
+print("\n======  STEP 1: copy tool4nanobio to new project:\n")
 to_file = os.path.join(proj_fullpath, ".travis.yml")        # (from_file, to_file)
 shutil.copy(".travis.yml", to_file)
 
 for elm in os.listdir('.'):
+    print("---- elm (dir)= ",elm)
     try:
         if ('Example_GUI' in elm):  # avoid /.git, etc
             continue
@@ -78,7 +79,7 @@ for elm in os.listdir('.'):
         print("   can't copy ... maybe you already did?")
 
 #------------------------------------
-print("\n\n STEP 2: copy PhysiCell project's source (and data files) to new project's /src:\n")
+print("\n\n======  STEP 2: copy PhysiCell project's source (and data files) to new project's /src:\n")
 # Copy (most of) your PhysiCell project to your project's /src directory
 #os.chdir(os.path.join(proj_fullpath, 'src'))
 proj_src_dir = os.path.join(proj_fullpath, 'src')
@@ -110,6 +111,35 @@ with open(from_file,"r") as infile:
                     newline = sline[0] + sline[1] + " myproj\n"
                     outfile.write(newline)
 #                    outfile.write("\nUNAME := $(shell uname)\n")
+
+#--------- new crap that Steve had me add during dev of pc4covid19 ------------------
+                    # nanohub_extra_crap = "install: \n\t$(MODINIT); $(MODCMD); make all\n\tinstall --mode 0755 -D $(PROGRAM_NAME) $(BIN)/$(PROGRAM_NAME)\n\ndistclean: clean\n\trm -f $(BIN)/$(PROGRAM_NAME)\n\trm -rf $(BIN)/__pycache__\n\trm -rf ../.ipynb_checkpoints\n\n"
+                    nanohub_extra_crap = 'osRelease = $(shell lsb_release -r | sed -e "s/Release:\W*//" -e "s/\..*//")\nifeq ($(osRelease),7)\n\thostName = $(shell hostname | sed -e "s:[-_].*::")$(osRelease)\nelse\n\thostName = $(shell hostname | sed -e "s:[-_].*::")\nendif\n\nifeq ($(hostName),nanohub7)\n\tBIN = ../bin\n\tMODINIT = . /etc/environ.sh\n\tMODCMD = use -e -r anaconda3-5.1\nelse\nifeq ($(hostName),rice7)\n\tBIN = ../bin/rice7\n\tMODINIT = . $(MODULESHOME)/init/sh\n\tMODCMD = module purge 2> /dev/null; module load gcc/7.3.0\nendif\nifeq ($(hostName),brown7)\n\tBIN = ../bin/brown7\n\tMODINIT = . $(MODULESHOME)/init/sh\n\tMODCMD = module purge 2> /dev/null; module load gcc/7.3.0\nendif\nendif\n'
+                    outfile.write(nanohub_extra_crap)
+# osRelease = $(shell lsb_release -r | sed -e "s/Release:\W*//" -e "s/\..*//")
+# ifeq ($(osRelease),7)
+#    hostName = $(shell hostname | sed -e "s:[-_].*::")$(osRelease)
+# else
+#    hostName = $(shell hostname | sed -e "s:[-_].*::")
+# endif
+
+# ifeq ($(hostName),nanohub7)
+#    BIN = ../bin
+# 	MODINIT = . /etc/environ.sh
+#    MODCMD = use -e -r anaconda3-5.1
+# else
+# ifeq ($(hostName),rice7)
+#    BIN = ../bin/rice7
+# 	MODINIT = . $(MODULESHOME)/init/sh
+#    MODCMD = module purge 2> /dev/null; module load gcc/7.3.0
+# endif
+# ifeq ($(hostName),brown7)
+#    BIN = ../bin/brown7
+# 	MODINIT = . $(MODULESHOME)/init/sh
+#    MODCMD = module purge 2> /dev/null; module load gcc/7.3.0
+# endif
+# endif
+
                 elif sline[0][0:6] == "CFLAGS":
                     newline = "# remove the -march arg to avoid SIGILL error on nanoHUB\n"
                     outfile.write(newline)
@@ -118,8 +148,8 @@ with open(from_file,"r") as infile:
                 elif sline[0] == "clean:":
                     # print('got ',sline[0])
 #                    outfile.write(line)
-                    # nanohub_targets = "# next 2 targets for nanoHUB\ninstall: all\n\tcp $(PROGRAM_NAME) ../bin\n\ndistclean: clean\n\trm -f ../bin/$(PROGRAM_NAME)\n\n"
-                    nanohub_targets = "# next 2 targets for nanoHUB\ninstall: \n\t. /etc/environ.sh; use -e -r anaconda3-5.1; make all\n\tcp $(PROGRAM_NAME) ../bin\n\ndistclean: clean\n\trm -f ../bin/$(PROGRAM_NAME)\n\n"
+#                    nanohub_targets = "# next 2 targets for nanoHUB\ninstall: \n\t. /etc/environ.sh; use -e -r anaconda3-5.1; make all\n\tcp $(PROGRAM_NAME) ../bin\n\ndistclean: clean\n\trm -f ../bin/$(PROGRAM_NAME)\n\n"
+                    nanohub_targets = "# next 2 targets for nanoHUB\ninstall: \n\t$(MODINIT); $(MODCMD); make all\n\tinstall --mode 0755 -D $(PROGRAM_NAME) $(BIN)/$(PROGRAM_NAME)\n\ndistclean: clean\n\trm -f $(BIN)/$(PROGRAM_NAME)\n\trm -rf $(BIN)/__pycache__\n\trm -rf ../.ipynb_checkpoints\n\n"
                     outfile.write(nanohub_targets)
                     outfile.write("clean:\n")
                 elif "rm -f $(PROGRAM_NAME)*" in line:  # don't want last "*" on nanoHUB
@@ -178,12 +208,13 @@ tree.write(to_file)
 
 uep2 = xml_root.find('.//initial_conditions//cell_positions//filename')
 if uep2 == None:
-    print("******  WARNING: no initial_conditions//cell_positions//filename")
-csv_file = uep2.text
-from_file = os.path.join(physicell_fullpath, "config", csv_file)
-to_file = os.path.join(proj_fullpath, "data", csv_file)
-print(from_file, " --> ", to_file)
-shutil.copy(from_file, to_file)
+    print("******  FYI: no initial_conditions//cell_positions//filename to process.")
+else:
+    csv_file = uep2.text
+    from_file = os.path.join(physicell_fullpath, "config", csv_file)
+    to_file = os.path.join(proj_fullpath, "data", csv_file)
+    print(from_file, " --> ", to_file)
+    shutil.copy(from_file, to_file)
 
 # Similar to the config file going into /data, we also want the original output/initial.xml to be in /data
 from_file = os.path.join(physicell_fullpath, "output", "initial.xml")
@@ -192,7 +223,7 @@ print(from_file, " --> ", to_file)
 shutil.copy(from_file, to_file)
 
 #------------------------------------
-print("\n\n STEP 3: renaming files and file content to have new project and tool names:\n")
+print("\n\n======  STEP 3: renaming files and file content to have new project and tool names:\n")
 # maybe attempt to execute 'make_my_tool.py' from the new project dir?
 print("\n----- Now we will prepare your new project. ")
 os.chdir(proj_fullpath)
@@ -276,14 +307,37 @@ except:
     print("         You will need to do that manually.\n")
 
 
-print('---------------------------')
+print("-------------------------------------")
 config_file = "PhysiCell_settings.xml"
 tree = ET.parse(config_file)
 root = tree.getroot()
 if root.find('.//cell_definitions'):
     #os.chdir("..")
-    print('Trying to run create_cell_def.py on your .xml file in /data')
+    # print('Trying to run create_cell_def.py on your .xml file in /data')
+    print('------ <cell_definitions> are present.')
     #os.chdir("data")
+    backup_xml_file = "PhysiCell_settings_original.xml"
+    print('-- creating a backup of original: ',backup_xml_file)
+    shutil.copy(config_file, backup_xml_file)
+
+    # -------- NEW: March 2021
+    # Before we create the tab of widgets for cell_definitions, we want to
+    # convert a "hierarchical" cell_definitions (using 'parent_type' attribute)
+    # to "flattened" cell_definitions (there are no parents; each cell_def is expanded).
+    print('------ Convert hierarchical <cell_definitions> to flattened.')
+    cmd = 'python xml_hier2flat.py ' + config_file
+    print('------> ',cmd)
+    try:
+        os.system(cmd)
+    except:
+        print("  ---> Cannot execute: ",cmd)
+    # shutil.copy("recurse_xml_out.xml", config_file)
+    shutil.copy("flat_xml_out.xml", config_file)
+
+    #-------
+    # OK, now continue with the creation of the tab ("Cell Types") of widgets for cell_definitions
+    print('-----------------------------------------------------------')
+    print('Trying to run create_cell_def.py on your .xml file in /data')
     cmd = "python create_cell_types.py PhysiCell_settings.xml"
     print(cmd)
     try:
