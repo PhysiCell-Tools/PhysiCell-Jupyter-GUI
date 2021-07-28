@@ -137,6 +137,29 @@ In more detail, the ```setup_new_proj.py``` script should:
 The src/Makefile needs to be edited so that:
 ```
 PROGRAM_NAME := myproj
+
+osRelease = $(shell lsb_release -r | sed -e "s/Release:\W*//" -e "s/\..*//")
+ifeq ($(osRelease),7)
+   hostName = $(shell hostname | sed -e "s:[-_].*::")$(osRelease)
+else
+   hostName = $(shell hostname | sed -e "s:[-_].*::")
+endif
+ifeq ($(hostName),nanohub7)
+   BIN = ../bin
+   MODINIT = . /etc/environ.sh
+   MODCMD = use -e -r anaconda3-5.1
+else
+ifeq ($(hostName),rice7)
+   BIN = ../bin/rice7
+   MODINIT = . $(MODULESHOME)/init/sh
+   MODCMD = module purge 2> /dev/null; module load gcc/7.3.0
+endif
+ifeq ($(hostName),brown7)
+   BIN = ../bin/brown7
+   MODINIT = . $(MODULESHOME)/init/sh
+   MODCMD = module purge 2> /dev/null; module load gcc/7.3.0
+endif
+endif
 ```
 and in the `all` target, comment out copying the executable to ../bin:
 ```
@@ -146,11 +169,14 @@ all: main.cpp $(ALL_OBJECTS)
 ```
 also, be sure it has the following targets present (with the necessary leading tabs):
 ```
-install: all
-        cp $(PROGRAM_NAME) ../bin
+install:
+	$(MODINIT); $(MODCMD);  make all
+	install --mode 0755 -D $(PROGRAM_NAME) $(BIN)/$(PROGRAM_NAME)
 
 distclean: clean
-        rm -f ../bin/$(PROGRAM_NAME)
+	rm -f $(BIN)/$(PROGRAM_NAME)
+	rm -rf $(BIN)/__pycache__
+	rm -rf ../.ipynb_checkpoints
 ```
 and this target should not have the trailing "*":
 ```
