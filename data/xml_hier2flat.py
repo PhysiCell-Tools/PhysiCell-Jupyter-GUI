@@ -10,6 +10,7 @@
 
 import xml.etree.ElementTree as ET
 import sys
+import shutil
 import string
 import copy
 import os
@@ -116,6 +117,10 @@ for cd in kv:
 
 print("\n-------------------------------------------------------")
 print(' parent_children_dict= ',parent_children_dict)
+print(' len(parent_children_dict)= ',len(parent_children_dict))
+if len(parent_children_dict) == 0:
+    shutil.copy(orig_xml_file, "flat_xml_out.xml")
+    sys.exit()
 print("-------------------------------------------------------\n")
 
 xml_root = tree.getroot()
