@@ -729,8 +729,12 @@ for cell_def in uep.findall('cell_definition'):
             elm_str += handle_divider_pheno(prefix + "mechanics") + ", "
             subpath1 = subpath0  + "//" + child.tag
 
+            # rwh NOTE: this seems to have problems with the new <cell_adhesion_affinities>
             for elm in child:
-                if elm.tag == 'options':
+                if elm.tag == 'cell_adhesion_affinities':
+                    print("found/skip over <cell_adhesion_affinities>")
+                    continue
+                elif elm.tag == 'options':
                     subpath2 = subpath1  + "//" + elm.tag
                     for opt_elm in elm:
                         subpath3 = subpath2  + "//" + opt_elm.tag
