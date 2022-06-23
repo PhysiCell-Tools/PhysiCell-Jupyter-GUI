@@ -1031,6 +1031,10 @@ for cell_def in uep.findall('cell_definition'):
         for cd in uep_custom_data:   
             if print_vars:
                 print(' >> custom_data:  ',cd.tag, cd.attrib)
+		
+            if 'hidden' in cd.attrib.keys() and (cd.attrib['hidden'].lower() == "true"):
+                print("  HIDE this parameter from the GUI: ", cd.tag)
+                continue
 
             create_disabled_button_name(cd.tag)   # creates "button_widget_name"
 
